@@ -1,0 +1,10 @@
+mvnw
+.mvn
+*.md
+*.cmd
+*.iml
+.idea
+*.sh
+target
+build-config
+
