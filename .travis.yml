@@ -6,4 +6,4 @@ before_install:
   - docker build -t paihari/binance-buylow -f Dockerfile .
 
 script:
-  - docker run -e CI=true paihari/binance-buylow sh -- --watchAll=false
+  - ./mvnw clean install test -B

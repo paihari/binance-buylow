@@ -1,0 +1,9 @@
+FROM maven as maven
+COPY ./pom.xml ./pom.xml
+
+RUN mvn dependency:go-offline -B
+
+COPY ./src ./src
+
+RUN mvn package test -B
+
