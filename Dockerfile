@@ -9,6 +9,8 @@ RUN mvn package
 
 FROM openjdk:8u171-jre-alpine
 
+EXPOSE 8080
+
 WORKDIR /app
 
 COPY --from=maven target/*.jar ./
