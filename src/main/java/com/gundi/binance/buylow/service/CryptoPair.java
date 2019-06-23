@@ -8,7 +8,7 @@ import java.io.Serializable;
 public enum CryptoPair implements Serializable{
 
 
-    TRXUSDT("TRXUSDT", "100", "USDT", "TRX", true);
+    TRXUSDT("XRPUSDT", "100", "USDT", "XRP", true);
 
 
 

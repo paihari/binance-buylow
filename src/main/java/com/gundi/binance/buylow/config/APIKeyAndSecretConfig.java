@@ -28,6 +28,7 @@ public class APIKeyAndSecretConfig {
 
 
     private APIKeyAndSecret getSecretForLocal() {
+
         return new APIKeyAndSecret("", "");
     }
 
