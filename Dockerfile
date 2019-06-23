@@ -5,7 +5,7 @@ RUN mvn dependency:go-offline -B
 
 COPY ./src ./src
 
-RUN mvn package
+RUN mvn -Dmaven.test.skip=true package
 
 FROM openjdk:8u171-jre-alpine
 
