@@ -21,7 +21,7 @@ public class BuyLowController {
 
 
     @Autowired
-    TradingService service;
+    private TradingService service;
 
     @RequestMapping("/")
     public String home() {
