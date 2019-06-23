@@ -27,7 +27,7 @@ public class BuyLowController {
     public String home() {
 
         return  msg + " from " + env
-                + " Number of Trades " + service.getNumberOfTrades();
+                + " Number of Trades " + service.getNumberOfTrades() + " Number of Events " + service.getNumberOfEvents();
     }
 
 }

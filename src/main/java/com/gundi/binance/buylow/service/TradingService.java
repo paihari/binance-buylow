@@ -25,6 +25,12 @@ public class TradingService {
 
     private Integer numberOfTrades = 0;
 
+    public Integer getNumberOfEvents() {
+        return numberOfEvents;
+    }
+
+    private Integer numberOfEvents = 0;
+
     public void doIt() {
 
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance(
@@ -45,6 +51,7 @@ public class TradingService {
                 String lastPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
                 String lowPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLowPrice();
                 if (lastPrice.equals(lowPrice)) {
+                    numberOfEvents++;
                     BigDecimal d_lastPrice = new BigDecimal(lastPrice);
                     BigDecimal amountNeededForBuyTrade = d_lastPrice.multiply(new BigDecimal(cryptoPair.getQuantity()));
 
