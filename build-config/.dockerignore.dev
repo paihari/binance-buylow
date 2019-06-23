@@ -1,7 +1,0 @@
-.idea
-mvnw
-*.md
-.mvn
-*.iml
-buildDevDockerImage.sh
-build-config

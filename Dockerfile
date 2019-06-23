@@ -15,7 +15,7 @@ WORKDIR /app
 
 COPY --from=maven target/*.jar ./
 
-CMD ["java", "-jar", "./buylow-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "./buylow-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
 
 #WORKDIR /app
 ##COPY pom.xml .

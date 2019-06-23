@@ -1,0 +1,17 @@
+FROM maven as maven
+COPY ./pom.xml ./pom.xml
+
+RUN mvn dependency:go-offline -B
+
+COPY ./src ./src
+
+RUN mvn package
+
+FROM openjdk:8u171-jre-alpine
+
+
+WORKDIR /app
+
+COPY --from=maven target/*.jar ./
+
+CMD ["java", "-jar", "./buylow-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=dev"]
