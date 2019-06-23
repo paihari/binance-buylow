@@ -16,6 +16,12 @@ public class TradingService {
     @Autowired
     private APIKeyAndSecret apiKeyAndSecret;
 
+    public Integer getNumberOfTrades() {
+        return numberOfTrades;
+    }
+
+    private Integer numberOfTrades = 0;
+
     public void doIt() {
 
         BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance(
@@ -30,9 +36,13 @@ public class TradingService {
             public void onResponse(AggTradeEvent aggTradeEvent) {
                 String lastPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
                 System.out.println("Traded done " + lastPrice);
+                numberOfTrades ++;
             }
         });
 
 
     }
+
+
+
 }
