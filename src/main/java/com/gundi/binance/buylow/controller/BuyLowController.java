@@ -26,8 +26,7 @@ public class BuyLowController {
     @RequestMapping("/")
     public String home() {
 
-        return  msg + " from " + env + " API " + apiKeyAndSecret.getApiKey()
-                + " Secret " + apiKeyAndSecret.getApiSecret()
+        return  msg + " from " + env
                 + " Number of Trades " + service.getNumberOfTrades();
     }
 
