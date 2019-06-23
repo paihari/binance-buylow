@@ -23,11 +23,17 @@ public class BuyLowController {
     @Autowired
     private TradingService service;
 
+
+
+
     @RequestMapping("/")
     public String home() {
 
         return  msg + " from " + env
-                + " Number of Trades " + service.getNumberOfTrades() + " Number of Events " + service.getNumberOfEvents();
+                + " Number of Trades " + service.getNumberOfTrades()
+                + " Number of Events " + service.getNumberOfEvents()
+                + " Version 1";
+
     }
 
 }
