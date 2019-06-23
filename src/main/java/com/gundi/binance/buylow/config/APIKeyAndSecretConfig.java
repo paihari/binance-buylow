@@ -17,13 +17,18 @@ public class APIKeyAndSecretConfig {
     @Bean(name = "apiKeysAndSecret")
     @Profile(value = "dev")
     APIKeyAndSecret dev() {
-        return  getSecretFromAWSSecretManager();
+        return  getSecretForLocal();
     }
 
     @Bean(name = "apiKeysAndSecret")
     @Profile(value = "prod")
     APIKeyAndSecret prod() {
         return getSecretFromAWSSecretManager();
+    }
+
+
+    private APIKeyAndSecret getSecretForLocal() {
+        return new APIKeyAndSecret("", "");
     }
 
     private APIKeyAndSecret getSecretFromAWSSecretManager() {

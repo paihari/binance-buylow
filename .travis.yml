@@ -6,7 +6,7 @@ before_install:
   - docker build -t paihari/binance-buylow -f Dockerfile .
 
 script:
-  - ./mvnw clean test -B
+  - ./mvnw test -B --spring.profiles.active=dev
 
 deploy:
   provider: elasticbeanstalk
