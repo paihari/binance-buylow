@@ -22,6 +22,7 @@ public class BuylowApplication {
 
     public static void main(String[] args) throws Exception{
         ConfigurableApplicationContext context=  SpringApplication.run(BuylowApplication.class, args);
+
         TradingService tradingService = (TradingService)context.getBean("tradingService");
         tradingService.doIt();
     }

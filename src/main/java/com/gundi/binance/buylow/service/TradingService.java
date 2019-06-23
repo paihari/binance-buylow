@@ -4,10 +4,13 @@ import com.binance.api.client.BinanceApiCallback;
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.BinanceApiWebSocketClient;
+import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.gundi.binance.buylow.config.APIKeyAndSecret;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class TradingService {
@@ -29,20 +32,33 @@ public class TradingService {
         BinanceApiWebSocketClient binanceApiWebSocketClient = factory.newWebSocketClient();
         BinanceApiRestClient apiRestClient = factory.newRestClient();
 
-        System.out.println(binanceApiWebSocketClient);
-        binanceApiWebSocketClient.onAggTradeEvent("xrpusdt", new BinanceApiCallback<AggTradeEvent>() {
+
+        String pair = CryptoPair.getPairsAsString();
+
+
+        binanceApiWebSocketClient.onAggTradeEvent(pair.toLowerCase(), new BinanceApiCallback<AggTradeEvent>() {
 
             @Override
             public void onResponse(AggTradeEvent aggTradeEvent) {
+
+                CryptoPair cryptoPair = CryptoPair.fromPair(aggTradeEvent.getSymbol());
                 String lastPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
-                System.out.println("Traded done " + lastPrice);
-                numberOfTrades ++;
+                String lowPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLowPrice();
+                if (lastPrice.equals(lowPrice)) {
+                    BigDecimal d_lastPrice = new BigDecimal(lastPrice);
+                    BigDecimal amountNeededForBuyTrade = d_lastPrice.multiply(new BigDecimal(cryptoPair.getQuantity()));
+
+                    String baseCurrencyAssetBalanceStr = apiRestClient.getAccount().getAssetBalance(cryptoPair.getBaseCurrency()).getFree();
+                    BigDecimal amountInTheAccount = new BigDecimal(baseCurrencyAssetBalanceStr);
+                    if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
+                        apiRestClient.newOrderTest(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                        numberOfTrades ++;
+                    }
+
+
+                }
             }
         });
-
-
     }
-
-
 
 }
