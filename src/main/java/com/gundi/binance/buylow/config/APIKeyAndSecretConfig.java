@@ -29,7 +29,8 @@ public class APIKeyAndSecretConfig {
 
     private APIKeyAndSecret getSecretForLocal() {
 
-        return new APIKeyAndSecret("", "");
+        return new APIKeyAndSecret("",
+                "");
     }
 
     private APIKeyAndSecret getSecretFromAWSSecretManager() {
