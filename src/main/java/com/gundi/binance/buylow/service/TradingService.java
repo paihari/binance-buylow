@@ -46,6 +46,7 @@ public class TradingService {
                     @Override
                     public void onResponse(final AggTradeEvent aggTradeEvent) {
                         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
+
                         String lastPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
                         String lowPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLowPrice();
                         //System.out.println("The Last Price " + lastPrice + " The Low Price " + lowPrice );
@@ -57,7 +58,7 @@ public class TradingService {
                             String baseCurrencyAssetBalanceStr = apiRestClient.getAccount().getAssetBalance(cryptoPair.getBaseCurrency()).getFree();
                             BigDecimal amountInTheAccount = new BigDecimal(baseCurrencyAssetBalanceStr);
                             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-                                apiRestClient.newOrderTest(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                                apiRestClient.newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                                 numberOfTrades ++;
                             }
 
