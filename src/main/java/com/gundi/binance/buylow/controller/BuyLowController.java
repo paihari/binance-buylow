@@ -32,7 +32,7 @@ public class BuyLowController {
         return  msg + " from " + env
                 + " Number of Trades " + service.getNumberOfTrades()
                 + " Number of Events " + service.getNumberOfEvents()
-                + " Version 1";
+                + " Version 2";
 
     }
 
