@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class TradingService {
@@ -19,11 +21,6 @@ public class TradingService {
     @Autowired
     private APIKeyAndSecret apiKeyAndSecret;
 
-    public Integer getNumberOfTrades() {
-
-        return numberOfTrades;
-    }
-
     private Integer numberOfTrades = 0;
 
     public Integer getNumberOfEvents() {
@@ -31,6 +28,9 @@ public class TradingService {
     }
 
     private Integer numberOfEvents = 0;
+
+    private LocalDateTime lastTradeTime;
+
 
     public void doIt() {
 
@@ -47,10 +47,16 @@ public class TradingService {
                     public void onResponse(final AggTradeEvent aggTradeEvent) {
                         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
 
+
                         String lastPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
                         String lowPrice = apiRestClient.get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLowPrice();
                         //System.out.println("The Last Price " + lastPrice + " The Low Price " + lowPrice );
-                        if (lastPrice.equals(lowPrice)) {
+                        boolean tradeAble = false;
+                        if(lastTradeTime == null || lastTradeTime.plus(5, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
+                            tradeAble = true;
+                        }
+
+                        if (tradeAble && lastPrice.equals(lowPrice)) {
                             numberOfEvents++;
                             BigDecimal d_lastPrice = new BigDecimal(lastPrice);
                             BigDecimal amountNeededForBuyTrade = d_lastPrice.multiply(new BigDecimal(cryptoPair.getQuantity()));
@@ -60,6 +66,8 @@ public class TradingService {
                             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
                                 apiRestClient.newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                                 numberOfTrades ++;
+                                lastTradeTime = LocalDateTime.now();
+
                             }
 
 
@@ -72,5 +80,16 @@ public class TradingService {
                     }
                 });
     }
+
+
+    public Integer getNumberOfTrades() {
+
+        return numberOfTrades;
+    }
+
+    public LocalDateTime getLastTradeTime() {
+        return lastTradeTime;
+    }
+
 
 }
