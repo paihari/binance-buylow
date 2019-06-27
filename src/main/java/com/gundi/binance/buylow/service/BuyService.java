@@ -40,7 +40,7 @@ public class BuyService {
             String baseCurrencyAssetBalanceStr = authenticationService.getApiRestClient().getAccount().getAssetBalance(cryptoPair.getBaseCurrency()).getFree();
             BigDecimal amountInTheAccount = new BigDecimal(baseCurrencyAssetBalanceStr);
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-                authenticationService.getApiRestClient().newOrderTest(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                authenticationService.getApiRestClient().newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                 lastTradeTime = LocalDateTime.now();
                 //sellService.createSellOrder(aggTradeEvent.getSymbol());
             }
