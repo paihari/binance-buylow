@@ -1,7 +1,6 @@
 package com.gundi.binance.buylow.controller;
 
-import com.gundi.binance.buylow.config.APIKeyAndSecret;
-import com.gundi.binance.buylow.service.TradingService;
+import com.gundi.binance.buylow.service.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,25 +15,22 @@ public class BuyLowController {
     @Value("${msg}")
     private String msg;
 
+
+    private CalculationService calculationService;
+
     @Autowired
-    private APIKeyAndSecret apiKeyAndSecret;
-
-
-    @Autowired
-    private TradingService service;
-
-
+    public BuyLowController(CalculationService calculationService) {
+        this.calculationService = calculationService;
+    }
 
 
     @RequestMapping("/")
     public String home() {
-
+        calculationService.invoke("XRPUSDT");
         return  msg + " from " + env
-                + " Number of Trades " + service.getNumberOfTrades()
-                + " Number of Events " + service.getNumberOfEvents()
-                + " Last Data Time" + service.getLastTradeTime()
+                + " Number of Trades " + calculationService.getNoOfTrades()
+                + " Average Price " + calculationService.getAveragePrice()
+                + " Total Qty " + calculationService.getTotalQty()
                 + " Version 4";
-
     }
-
 }

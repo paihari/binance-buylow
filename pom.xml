@@ -42,13 +42,19 @@
         <dependency>
             <groupId>com.github.paihari</groupId>
             <artifactId>binance-java-api</artifactId>
-            <version>master</version>
+            <version>1d0eef80cf</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.9.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.decimal4j</groupId>
+            <artifactId>decimal4j</artifactId>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>

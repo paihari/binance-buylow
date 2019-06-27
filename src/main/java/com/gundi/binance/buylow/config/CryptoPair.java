@@ -1,4 +1,4 @@
-package com.gundi.binance.buylow.service;
+package com.gundi.binance.buylow.config;
 
 import java.io.Serializable;
 
