@@ -31,7 +31,8 @@ public class SellService {
 
         calculationService.invoke(aggTradeEvent.getSymbol());
 
-        int roundDecimalForSymbol = calculationService.getRoundDecimalForSymbol(aggTradeEvent.getSymbol());
+        int roundDecimalForSymbol = calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol());
+
         Double averagePrice = calculationService.getAveragePricePerSymbol(aggTradeEvent.getSymbol());
 
         Double stopPrice = DoubleRounder.round(averagePrice * 0.83, roundDecimalForSymbol);
@@ -62,7 +63,10 @@ public class SellService {
     private void createStopLossOrder(String symbol) {
 
         Double averagePrice = calculationService.getAveragePricePerSymbol(symbol);
-        int roundDecimalForSymbol = calculationService.getRoundDecimalForSymbol(symbol);
+        if(averagePrice.compareTo(Double.NaN) == 0)
+            return;
+
+        int roundDecimalForSymbol = calculationService.getRoundDecimalPerSymbol(symbol);
 
         Double stopPrice = DoubleRounder.round(averagePrice * 0.83, roundDecimalForSymbol);
         Double stopLimitPrice = DoubleRounder.round(averagePrice * 0.81, roundDecimalForSymbol);

@@ -4,6 +4,8 @@ import com.binance.api.client.BinanceApiCallback;
 import com.binance.api.client.domain.account.Trade;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.gundi.binance.buylow.config.CryptoPair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class BuyLowPrimeService {
 
     private AuthenticationService authenticationService;
+
+    Logger logger = LoggerFactory.getLogger(BuyLowPrimeService.class);
 
     private SellService sellService;
     private BuyService buyService;
@@ -35,13 +39,13 @@ public class BuyLowPrimeService {
                 new BinanceApiCallback<AggTradeEvent>() {
             @Override
             public void onResponse(final AggTradeEvent aggTradeEvent) {
-                System.err.println("Web Socket Active " + LocalDateTime.now());
+                logger.info("Web Socket Active " + LocalDateTime.now());
                 authenticationService.getApiRestClient().ping();
                 sellService.invoke(aggTradeEvent);
                 buyService.invoke(aggTradeEvent);
             }
             public void onFailure(final Throwable cause) {
-                System.err.println("Web Socket Failed " + LocalDateTime.now());
+                logger.error("Web Socket Failed " + LocalDateTime.now());
                 cause.printStackTrace();
                 invoke();
             }

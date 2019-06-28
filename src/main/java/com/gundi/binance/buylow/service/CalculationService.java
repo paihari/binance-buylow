@@ -10,6 +10,7 @@ import org.decimal4j.util.DoubleRounder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class CalculationService {
     private Map<String, Integer> noOfTradesPerSymbol = new HashMap<String, Integer>();
     private Map<String, Double> totalQtyPerSymbol = new HashMap<String, Double>();
     private Map<String, Double> averagePricePerSymbol = new HashMap<String, Double>();
+    private Map<String, Integer> roundDecimalPerSymbol = new HashMap<String, Integer>();
 
 
     public CalculationService(AuthenticationService authenticationService) {
@@ -38,6 +40,7 @@ public class CalculationService {
     public void invoke(String symbol) {
 
         List<Trade> allTradeList = authenticationService.getApiRestClient().getMyTrades(symbol);
+
         Optional<Trade> lastTradedSellOrder = allTradeList.stream().filter(trade -> {
             return trade.isMaker();
         }).max((i, j) -> Long.valueOf(i.getTime()).compareTo(Long.valueOf(j.getTime())));
@@ -47,6 +50,7 @@ public class CalculationService {
         List<Trade> activeBuytradeList = allTradeList.stream().filter(trade -> {
             return trade.isBuyer() && trade.getTime() > lastSellOrderTime;
         }).collect(Collectors.toList());
+
         noOfTradesPerSymbol.put(symbol,
                 activeBuytradeList.size());
         totalQtyPerSymbol.put(symbol,
@@ -64,21 +68,26 @@ public class CalculationService {
         }).sum();
 
         Double averagePricePerQty = totalPrice/totalQtyPerSymbol.get(symbol);
-        return DoubleRounder.round(averagePricePerQty, getRoundDecimalForSymbol(symbol));
+        return DoubleRounder.round(averagePricePerQty, roundDecimalPerSymbol.get(symbol));
     }
 
-    public int getRoundDecimalForSymbol(String symbol) {
+    @PostConstruct
+    public void initRoundDecimalForSymbol() {
 
-        ExchangeInfo exchangeInfo = authenticationService.getApiRestClient().getExchangeInfo();
-        List<SymbolFilter> symbolFilterList = exchangeInfo.getSymbolInfo(symbol).getFilters();
+        for(CryptoPair cryptoPair : CryptoPair.values()) {
+            ExchangeInfo exchangeInfo = authenticationService.getApiRestClient().getExchangeInfo();
+            List<SymbolFilter> symbolFilterList = exchangeInfo.getSymbolInfo(cryptoPair.getPair()).getFilters();
 
-        for(SymbolFilter symbolFilter : symbolFilterList) {
+            for(SymbolFilter symbolFilter : symbolFilterList) {
 
-            if(symbolFilter.getFilterType().compareTo(FilterType.PRICE_FILTER) == 0) {
-                return symbolFilter.getTickSize().indexOf('1') -1;
+                if(symbolFilter.getFilterType().compareTo(FilterType.PRICE_FILTER) == 0) {
+                    roundDecimalPerSymbol.put(cryptoPair.getPair(),
+                            symbolFilter.getTickSize().indexOf('1') -1);
+                }
             }
         }
-        return Integer.MIN_VALUE;
+
+
     }
 
     public Integer getNoOfTradesPerSymbol(String symbol) {
@@ -93,8 +102,7 @@ public class CalculationService {
         return averagePricePerSymbol.get(symbol);
     }
 
-
-
-
-
+    public Integer getRoundDecimalPerSymbol(String symbol) {
+        return roundDecimalPerSymbol.get(symbol);
+    }
 }
