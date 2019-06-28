@@ -10,10 +10,7 @@ import org.decimal4j.util.DoubleRounder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,9 +20,9 @@ public class CalculationService {
     private AuthenticationService authenticationService;
 
 
-    private Map<String, Integer> noOfTradesPerSymbol = Collections.emptyMap();
-    private Map<String, Double> totalQtyPerSymbol = Collections.emptyMap();
-    private Map<String, Double> averagePricePerSymbol = Collections.emptyMap();
+    private Map<String, Integer> noOfTradesPerSymbol = new HashMap<String, Integer>();
+    private Map<String, Double> totalQtyPerSymbol = new HashMap<String, Double>();
+    private Map<String, Double> averagePricePerSymbol = new HashMap<String, Double>();
 
 
     public CalculationService(AuthenticationService authenticationService) {
