@@ -5,11 +5,14 @@ import com.binance.api.client.domain.general.ExchangeInfo;
 import com.binance.api.client.domain.general.FilterType;
 import com.binance.api.client.domain.general.SymbolFilter;
 import com.gundi.binance.buylow.config.APIKeyAndSecret;
+import com.gundi.binance.buylow.config.CryptoPair;
 import org.decimal4j.util.DoubleRounder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,17 +22,24 @@ public class CalculationService {
 
     private AuthenticationService authenticationService;
 
-    private Integer noOfTrades = 0;
 
-    private Double totalQty = Double.NaN;
+    private Map<String, Integer> noOfTradesPerSymbol = Collections.emptyMap();
+    private Map<String, Double> totalQtyPerSymbol = Collections.emptyMap();
+    private Map<String, Double> averagePricePerSymbol = Collections.emptyMap();
 
-    private Double averagePrice = Double.NaN;
 
     public CalculationService(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
+    public void invoke() {
+        for(CryptoPair cryptoPair : CryptoPair.values()) {
+            invoke(cryptoPair.getPair());
+        }
+    }
+
     public void invoke(String symbol) {
+
         List<Trade> allTradeList = authenticationService.getApiRestClient().getMyTrades(symbol);
         Optional<Trade> lastTradedSellOrder = allTradeList.stream().filter(trade -> {
             return trade.isMaker();
@@ -40,9 +50,12 @@ public class CalculationService {
         List<Trade> activeBuytradeList = allTradeList.stream().filter(trade -> {
             return trade.isBuyer() && trade.getTime() > lastSellOrderTime;
         }).collect(Collectors.toList());
-        noOfTrades = activeBuytradeList.size();
-        totalQty = activeBuytradeList.stream().mapToDouble(s -> Double.parseDouble(s.getQty())).sum();
-        averagePrice = calculateAveragePrice(symbol, activeBuytradeList);
+        noOfTradesPerSymbol.put(symbol,
+                activeBuytradeList.size());
+        totalQtyPerSymbol.put(symbol,
+                activeBuytradeList.stream().mapToDouble(s -> Double.parseDouble(s.getQty())).sum());
+        averagePricePerSymbol.put(symbol, calculateAveragePrice(symbol, activeBuytradeList));
+
     }
 
     private Double calculateAveragePrice(String symbol, List<Trade> tradeList) {
@@ -53,7 +66,7 @@ public class CalculationService {
             return  price * qty;
         }).sum();
 
-        Double averagePricePerQty = totalPrice/totalQty;
+        Double averagePricePerQty = totalPrice/totalQtyPerSymbol.get(symbol);
         return DoubleRounder.round(averagePricePerQty, getRoundDecimalForSymbol(symbol));
     }
 
@@ -71,27 +84,20 @@ public class CalculationService {
         return Integer.MIN_VALUE;
     }
 
-    public Integer getNoOfTrades() {
-        return noOfTrades;
+    public Integer getNoOfTradesPerSymbol(String symbol) {
+        return noOfTradesPerSymbol.get(symbol);
     }
 
-    public void setNoOfTrades(Integer noOfTrades) {
-        this.noOfTrades = noOfTrades;
+    public Double getTotalQtyPerSymbol(String symbol) {
+        return totalQtyPerSymbol.get(symbol);
     }
 
-    public Double getTotalQty() {
-        return totalQty;
+    public  Double getAveragePricePerSymbol(String symbol) {
+        return averagePricePerSymbol.get(symbol);
     }
 
-    public void setTotalQty(Double totalQty) {
-        this.totalQty = totalQty;
-    }
 
-    public Double getAveragePrice() {
-        return averagePrice;
-    }
 
-    public void setAveragePrice(Double averagePrice) {
-        this.averagePrice = averagePrice;
-    }
+
+
 }

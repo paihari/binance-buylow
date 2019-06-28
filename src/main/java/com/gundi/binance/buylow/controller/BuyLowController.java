@@ -1,5 +1,6 @@
 package com.gundi.binance.buylow.controller;
 
+import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.service.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +27,18 @@ public class BuyLowController {
 
     @RequestMapping("/")
     public String home() {
-        calculationService.invoke("XRPUSDT");
-        return  msg + " from " + env
-                + " Number of Trades " + calculationService.getNoOfTrades()
-                + " Average Price " + calculationService.getAveragePrice()
-                + " Total Qty " + calculationService.getTotalQty()
-                + " Version 4";
+        calculationService.invoke();
+        String message = msg + " from " + env + System. lineSeparator();
+        for(CryptoPair cryptoPair : CryptoPair.values()) {
+            message = message + " Symbol " + cryptoPair.getPair() +
+                    " Number of Trades " + calculationService.getNoOfTradesPerSymbol(cryptoPair.getPair()) +
+                    " Average Price " + calculationService.getAveragePricePerSymbol(cryptoPair.getPair()) +
+                    " Total Qty " + calculationService.getTotalQtyPerSymbol(cryptoPair.getPair()) +
+                    System.lineSeparator();
+
+
+        }
+
+        return  message;
     }
 }

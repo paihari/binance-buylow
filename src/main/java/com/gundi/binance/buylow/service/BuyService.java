@@ -27,7 +27,7 @@ public class BuyService {
         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
         String lastPrice = authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLastPrice();
         String lowPrice = authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol()).getLowPrice();
-        //System.out.println("The Last Price " + lastPrice + " The Low Price " + lowPrice );
+
         boolean tradeAble = false;
         if(lastTradeTime == null || lastTradeTime.plus(5, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
             tradeAble = true;
@@ -42,7 +42,7 @@ public class BuyService {
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
                 authenticationService.getApiRestClient().newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                 lastTradeTime = LocalDateTime.now();
-                //sellService.createSellOrder(aggTradeEvent.getSymbol());
+
             }
         }
     }

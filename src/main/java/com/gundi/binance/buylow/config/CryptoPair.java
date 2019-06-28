@@ -1,6 +1,7 @@
 package com.gundi.binance.buylow.config;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by pai on 14.12.18.
@@ -55,10 +56,6 @@ public enum CryptoPair implements Serializable{
         return keepOnBuying;
     }
 
-    public static CryptoPair fromPair(String pair) {
-
-        return valueOf(pair);
-    }
 
     public static String getPairsAsString() {
         String pairs = "";
