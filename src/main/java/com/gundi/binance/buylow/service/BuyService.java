@@ -36,10 +36,12 @@ public class BuyService {
 
         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
         TickerStatistics  tickerStatistics=  authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol());
-        Double lastPrice = DoubleRounder.round(Double.parseDouble(tickerStatistics.getLastPrice()),
+        String lastPrice_str = tickerStatistics.getLastPrice();
+        Double lastPrice = DoubleRounder.round(Double.parseDouble(lastPrice_str),
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
 
-        Double lowPrice = DoubleRounder.round(Double.parseDouble(tickerStatistics.getLowPrice()),
+        String lowPrice_str = tickerStatistics.getLowPrice();
+        Double lowPrice = DoubleRounder.round(Double.parseDouble(lowPrice_str),
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
 
         boolean tradeAble = false;
@@ -47,7 +49,8 @@ public class BuyService {
             tradeAble = true;
         }
 
-        if (tradeAble && lastPrice.compareTo(lowPrice) == 0) {
+        if (tradeAble && lastPrice_str.compareTo(lowPrice_str) == 0) {
+            logger.trace("Event Occured " + aggTradeEvent + " Price " + lastPrice_str);
 
             Double amountNeededForBuyTrade = lastPrice * Double.parseDouble(cryptoPair.getQuantity());
 
