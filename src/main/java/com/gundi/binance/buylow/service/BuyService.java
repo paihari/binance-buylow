@@ -45,7 +45,6 @@ public class BuyService {
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
         LocalDateTime lastTradeTime = calculationService.getLastTradeTimePerSymbol(aggTradeEvent.getSymbol());
 
-        System.out.println("Last Trade Time Symobol " + aggTradeEvent.getSymbol() + "   " + lastTradeTime );
 
         boolean tradeAble = false;
         if(lastTradeTime == null || lastTradeTime.plus(15, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
