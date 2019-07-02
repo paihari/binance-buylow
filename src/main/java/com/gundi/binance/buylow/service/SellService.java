@@ -78,7 +78,7 @@ public class SellService {
                 quantity, stopLimitPrice.toString());
 
         order.stopPrice(stopPrice.toString());
-        authenticationService.getApiRestClient().newOrder(order);
+        authenticationService.getApiRestClient().newOrderTest(order);
 
     }
 

@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,11 @@ public class CalculationService {
     private Map<String, Double> totalQtyPerSymbol = new HashMap<String, Double>();
     private Map<String, Double> averagePricePerSymbol = new HashMap<String, Double>();
     private Map<String, Integer> roundDecimalPerSymbol = new HashMap<String, Integer>();
+
+
+
+    private Map<String, LocalDateTime> lastTradeTimePerSymbol = new HashMap<String, LocalDateTime>();
+
 
 
     public CalculationService(AuthenticationService authenticationService) {
@@ -51,11 +59,21 @@ public class CalculationService {
             return trade.isBuyer() && trade.getTime() > lastSellOrderTime;
         }).collect(Collectors.toList());
 
+
         noOfTradesPerSymbol.put(symbol,
                 activeBuytradeList.size());
         totalQtyPerSymbol.put(symbol,
                 activeBuytradeList.stream().mapToDouble(s -> Double.parseDouble(s.getQty())).sum());
         averagePricePerSymbol.put(symbol, calculateAveragePrice(symbol, activeBuytradeList));
+
+        OptionalLong lastTradeTimeEpoch = activeBuytradeList.stream().mapToLong(s -> s.getTime()).max();
+        LocalDateTime lastTradeTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(lastTradeTimeEpoch.orElse(Long.MIN_VALUE)), ZoneId.systemDefault());
+        lastTradeTimePerSymbol.put(symbol, lastTradeTime);
+
+
+
+
 
     }
 
@@ -104,5 +122,9 @@ public class CalculationService {
 
     public Integer getRoundDecimalPerSymbol(String symbol) {
         return roundDecimalPerSymbol.get(symbol);
+    }
+
+    public LocalDateTime getLastTradeTimePerSymbol(String symbol) {
+        return lastTradeTimePerSymbol.get(symbol);
     }
 }

@@ -22,7 +22,7 @@ public class BuyService {
     private AuthenticationService authenticationService;
     private CalculationService calculationService;
 
-    private LocalDateTime lastTradeTime = null;
+
 
     @Autowired
     public BuyService(AuthenticationService authenticationService,
@@ -43,9 +43,12 @@ public class BuyService {
         String lowPrice_str = tickerStatistics.getLowPrice();
         Double lowPrice = DoubleRounder.round(Double.parseDouble(lowPrice_str),
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
+        LocalDateTime lastTradeTime = calculationService.getLastTradeTimePerSymbol(aggTradeEvent.getSymbol());
+
+        System.out.println("Last Trade Time Symobol " + aggTradeEvent.getSymbol() + "   " + lastTradeTime );
 
         boolean tradeAble = false;
-        if(lastTradeTime == null || lastTradeTime.plus(5, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
+        if(lastTradeTime == null || lastTradeTime.plus(15, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
             tradeAble = true;
         }
 
@@ -60,7 +63,7 @@ public class BuyService {
             Double amountInTheAccount = Double.parseDouble(baseCurrencyAssetBalanceStr);
 
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-                authenticationService.getApiRestClient().newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                authenticationService.getApiRestClient().newOrderTest(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                 lastTradeTime = LocalDateTime.now();
                 logger.info("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
 
