@@ -8,7 +8,10 @@ import com.binance.api.client.domain.account.Order;
 import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
+import com.binance.api.client.domain.market.TickerStatistics;
 import org.decimal4j.util.DoubleRounder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,8 @@ public class SellService {
     private AuthenticationService authenticationService;
     private CalculationService calculationService;
 
+    Logger logger = LoggerFactory.getLogger(SellService.class);
+
     @Autowired
     public SellService(AuthenticationService authenticationService, CalculationService calculationService) {
         this.authenticationService = authenticationService;
@@ -30,13 +35,13 @@ public class SellService {
     public void invoke(AggTradeEvent aggTradeEvent) {
 
         calculationService.invoke(aggTradeEvent.getSymbol());
+        //deleteAndCreateOrCreateStopOrder(aggTradeEvent.getSymbol());
 
         int roundDecimalForSymbol = calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol());
 
         Double averagePrice = calculationService.getAveragePricePerSymbol(aggTradeEvent.getSymbol());
 
         Double stopPrice = DoubleRounder.round(averagePrice * 0.83, roundDecimalForSymbol);
-        Double stopLimitPrice = DoubleRounder.round(averagePrice * 0.81, roundDecimalForSymbol);
 
         List<Order> openOrders = authenticationService.getApiRestClient().
                 getOpenOrders(new OrderRequest(aggTradeEvent.getSymbol()));
@@ -60,6 +65,16 @@ public class SellService {
         }
     }
 
+    private void deleteAndCreateOrCreateStopOrder(String symbol) {
+        TickerStatistics tickerStatistics =  authenticationService.getApiRestClient().get24HrPriceStatistics(
+                symbol);
+        Double percentageChange = DoubleRounder.round(Double.parseDouble(tickerStatistics.getPriceChangePercent()), 2);
+        logger.info("Percentage Change " + percentageChange) ;
+        System.exit(0);
+    }
+
+
+
     private void createStopLossOrder(String symbol) {
 
         Double averagePrice = calculationService.getAveragePricePerSymbol(symbol);
@@ -78,7 +93,7 @@ public class SellService {
                 quantity, stopLimitPrice.toString());
 
         order.stopPrice(stopPrice.toString());
-        authenticationService.getApiRestClient().newOrderTest(order);
+        authenticationService.getApiRestClient().newOrder(order);
 
     }
 

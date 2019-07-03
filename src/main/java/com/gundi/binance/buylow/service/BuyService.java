@@ -35,7 +35,7 @@ public class BuyService {
     public void invoke(AggTradeEvent aggTradeEvent) {
 
         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
-        TickerStatistics  tickerStatistics=  authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol());
+        TickerStatistics  tickerStatistics =  authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol());
         String lastPrice_str = tickerStatistics.getLastPrice();
         Double lastPrice = DoubleRounder.round(Double.parseDouble(lastPrice_str),
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
@@ -62,7 +62,7 @@ public class BuyService {
             Double amountInTheAccount = Double.parseDouble(baseCurrencyAssetBalanceStr);
 
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-                authenticationService.getApiRestClient().newOrderTest(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                authenticationService.getApiRestClient().newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
                 lastTradeTime = LocalDateTime.now();
                 logger.info("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
 
