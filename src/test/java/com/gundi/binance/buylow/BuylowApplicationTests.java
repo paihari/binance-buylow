@@ -25,11 +25,6 @@ public class BuylowApplicationTests {
     @Autowired
     CalculationService calculationService;
 
-    @Autowired
-    AuthenticationService authenticationService;
-
-
-
 
     @Test
     public void contextLoads() {
@@ -82,11 +77,6 @@ public class BuylowApplicationTests {
 
         Double stopLimitPrice = DoubleRounder.round(avgRounded * 0.81, round);
         System.out.println("Stop Limit Price " + stopLimitPrice);
-
-
-
-
-
 
 
 
