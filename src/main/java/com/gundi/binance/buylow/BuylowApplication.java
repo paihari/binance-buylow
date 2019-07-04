@@ -16,9 +16,9 @@ public class BuylowApplication {
 
     public static void main(String[] args) throws Exception{
         ConfigurableApplicationContext context=  SpringApplication.run(BuylowApplication.class, args);
-        String[] beanNames = context.getBeanDefinitionNames();
-        BuyLowPrimeService buyLowPrimeService = (BuyLowPrimeService)context.getBean("buyLowPrimeService");
-        buyLowPrimeService.invoke();
+//        String[] beanNames = context.getBeanDefinitionNames();
+//        BuyLowPrimeService buyLowPrimeService = (BuyLowPrimeService)context.getBean("buyLowPrimeService");
+//        buyLowPrimeService.invoke();
 
     }
 

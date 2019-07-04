@@ -31,7 +31,7 @@ public class BuyLowController {
         String message = msg + " from " + env + System. lineSeparator();
         for(CryptoPair cryptoPair : CryptoPair.values()) {
             message = message + " Symbol " + cryptoPair.getPair() +
-                    " Number of Trades " + calculationService.getNoOfTradesPerSymbol(cryptoPair.getPair()) +
+
                     " Average Price " + calculationService.getAveragePricePerSymbol(cryptoPair.getPair()) +
                     " Total Qty " + calculationService.getTotalQtyPerSymbol(cryptoPair.getPair()) +
                     System.lineSeparator();

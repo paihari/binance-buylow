@@ -7,7 +7,7 @@ import com.gundi.binance.buylow.config.APIKeyAndSecret;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class AuthenticationService {
 
     private APIKeyAndSecret apiKeyAndSecret;
@@ -29,6 +29,7 @@ public class AuthenticationService {
 
 
     public BinanceApiWebSocketClient getBinanceApiWebSocketClient() {
+
         return binanceApiWebSocketClient;
     }
 

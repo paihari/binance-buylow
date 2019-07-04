@@ -3,6 +3,7 @@ package com.gundi.binance.buylow.service;
 import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.market.TickerStatistics;
+import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
 import org.decimal4j.util.DoubleRounder;
 import org.slf4j.Logger;
@@ -19,23 +20,25 @@ public class BuyService {
 
     Logger logger = LoggerFactory.getLogger(BuyService.class);
 
-    private AuthenticationService authenticationService;
+    private APIClient apiClient;
     private CalculationService calculationService;
 
 
 
+
     @Autowired
-    public BuyService(AuthenticationService authenticationService,
+    public BuyService(APIClient apiClient,
                       CalculationService calculationService) {
-        this.authenticationService = authenticationService;
+        this.apiClient = apiClient;
         this.calculationService = calculationService;
     }
+
 
 
     public void invoke(AggTradeEvent aggTradeEvent) {
 
         CryptoPair cryptoPair = CryptoPair.valueOf(aggTradeEvent.getSymbol());
-        TickerStatistics  tickerStatistics =  authenticationService.getApiRestClient().get24HrPriceStatistics(aggTradeEvent.getSymbol());
+        TickerStatistics  tickerStatistics =  apiClient.get24HrPriceStatistics(aggTradeEvent.getSymbol());
         String lastPrice_str = tickerStatistics.getLastPrice();
         Double lastPrice = DoubleRounder.round(Double.parseDouble(lastPrice_str),
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
@@ -57,14 +60,13 @@ public class BuyService {
             Double amountNeededForBuyTrade = lastPrice * Double.parseDouble(cryptoPair.getQuantity());
 
             String baseCurrencyAssetBalanceStr =
-                    authenticationService.getApiRestClient().getAccount().getAssetBalance(
+                    apiClient.getAssetBalance(
                             cryptoPair.getBaseCurrency()).getFree();
             Double amountInTheAccount = Double.parseDouble(baseCurrencyAssetBalanceStr);
 
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-                authenticationService.getApiRestClient().newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
-                lastTradeTime = LocalDateTime.now();
-                logger.info("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
+                apiClient.newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
+                logger.trace("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
 
             }
         }

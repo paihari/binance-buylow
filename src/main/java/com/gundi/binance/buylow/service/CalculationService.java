@@ -4,6 +4,7 @@ import com.binance.api.client.domain.account.Trade;
 import com.binance.api.client.domain.general.ExchangeInfo;
 import com.binance.api.client.domain.general.FilterType;
 import com.binance.api.client.domain.general.SymbolFilter;
+import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.APIKeyAndSecret;
 import com.gundi.binance.buylow.config.CryptoPair;
 import org.decimal4j.util.DoubleRounder;
@@ -21,10 +22,9 @@ import java.util.stream.Collectors;
 public class CalculationService {
 
 
-    private AuthenticationService authenticationService;
+    private APIClient apiClient;
 
 
-    private Map<String, Integer> noOfTradesPerSymbol = new HashMap<String, Integer>();
     private Map<String, Double> totalQtyPerSymbol = new HashMap<String, Double>();
     private Map<String, Double> averagePricePerSymbol = new HashMap<String, Double>();
     private Map<String, Integer> roundDecimalPerSymbol = new HashMap<String, Integer>();
@@ -33,10 +33,9 @@ public class CalculationService {
 
     private Map<String, LocalDateTime> lastTradeTimePerSymbol = new HashMap<String, LocalDateTime>();
 
-
-
-    public CalculationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    @Autowired
+    public CalculationService(APIClient apiClient) {
+        this.apiClient = apiClient;
     }
 
     public void invoke() {
@@ -47,7 +46,7 @@ public class CalculationService {
 
     public void invoke(String symbol) {
 
-        List<Trade> allTradeList = authenticationService.getApiRestClient().getMyTrades(symbol);
+        List<Trade> allTradeList = apiClient.getMyTrades(symbol);
 
         Optional<Trade> lastTradedSellOrder = allTradeList.stream().filter(trade -> {
             return trade.isMaker();
@@ -60,10 +59,10 @@ public class CalculationService {
         }).collect(Collectors.toList());
 
 
-        noOfTradesPerSymbol.put(symbol,
-                activeBuytradeList.size());
+
         totalQtyPerSymbol.put(symbol,
                 activeBuytradeList.stream().mapToDouble(s -> Double.parseDouble(s.getQty())).sum());
+
         averagePricePerSymbol.put(symbol, calculateAveragePrice(symbol, activeBuytradeList));
 
         OptionalLong lastTradeTimeEpoch = activeBuytradeList.stream().mapToLong(s -> s.getTime()).max();
@@ -93,7 +92,7 @@ public class CalculationService {
     public void initRoundDecimalForSymbol() {
 
         for(CryptoPair cryptoPair : CryptoPair.values()) {
-            ExchangeInfo exchangeInfo = authenticationService.getApiRestClient().getExchangeInfo();
+            ExchangeInfo exchangeInfo = apiClient.getExchangeInfo();
             List<SymbolFilter> symbolFilterList = exchangeInfo.getSymbolInfo(cryptoPair.getPair()).getFilters();
 
             for(SymbolFilter symbolFilter : symbolFilterList) {
@@ -108,9 +107,6 @@ public class CalculationService {
 
     }
 
-    public Integer getNoOfTradesPerSymbol(String symbol) {
-        return noOfTradesPerSymbol.get(symbol);
-    }
 
     public Double getTotalQtyPerSymbol(String symbol) {
         return totalQtyPerSymbol.get(symbol);
