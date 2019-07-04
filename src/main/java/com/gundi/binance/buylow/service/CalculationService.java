@@ -8,6 +8,8 @@ import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.APIKeyAndSecret;
 import com.gundi.binance.buylow.config.CryptoPair;
 import org.decimal4j.util.DoubleRounder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class CalculationService {
+
+    Logger logger = LoggerFactory.getLogger(CalculationService.class);
 
 
     private APIClient apiClient;
@@ -49,10 +53,10 @@ public class CalculationService {
         List<Trade> allTradeList = apiClient.getMyTrades(symbol);
 
         Optional<Trade> lastTradedSellOrder = allTradeList.stream().filter(trade -> {
-            return trade.isMaker();
+            return !trade.isBuyer();
         }).max((i, j) -> Long.valueOf(i.getTime()).compareTo(Long.valueOf(j.getTime())));
 
-       long lastSellOrderTime = (lastTradedSellOrder.isPresent()) ? lastTradedSellOrder.get().getTime()  : 1561465294471L;
+        long lastSellOrderTime = (lastTradedSellOrder.isPresent()) ? lastTradedSellOrder.get().getTime()  : 1561465294471L;
 
         List<Trade> activeBuytradeList = allTradeList.stream().filter(trade -> {
             return trade.isBuyer() && trade.getTime() > lastSellOrderTime;
@@ -69,10 +73,6 @@ public class CalculationService {
         LocalDateTime lastTradeTime =
                 LocalDateTime.ofInstant(Instant.ofEpochMilli(lastTradeTimeEpoch.orElse(Long.MIN_VALUE)), ZoneId.systemDefault());
         lastTradeTimePerSymbol.put(symbol, lastTradeTime);
-
-
-
-
 
     }
 
