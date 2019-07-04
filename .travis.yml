@@ -10,11 +10,11 @@ script:
 
 deploy:
   provider: elasticbeanstalk
-  region: "us-east-1"
-  app: "buylow-app"
-  env: "BuylowApp-env"
-  bucket_name: "elasticbeanstalk-us-east-1-898024814010"
-  bucket_path: "buylow-app"
+  region: "$AWS_REGION"
+  app: "$AWS_APP"
+  env: "$AWS_ENV"
+  bucket_name: "$AWS_BUCKET"
+  bucket_path: "$AWS_BUCKET_PATH"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY

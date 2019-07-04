@@ -9,6 +9,7 @@ import org.decimal4j.util.DoubleRounder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,8 +21,12 @@ public class BuyService {
 
     Logger logger = LoggerFactory.getLogger(BuyService.class);
 
+    @Value("${buy.cool.off.time}")
+    Integer buyCoolOffTime;
+
     private APIClient apiClient;
     private CalculationService calculationService;
+
 
 
 
@@ -50,7 +55,7 @@ public class BuyService {
 
 
         boolean tradeAble = false;
-        if(lastTradeTime == null || lastTradeTime.plus(15, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
+        if(lastTradeTime == null || lastTradeTime.plus(buyCoolOffTime, ChronoUnit.MINUTES).isBefore(LocalDateTime.now())) {
             tradeAble = true;
         }
 
