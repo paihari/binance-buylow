@@ -14,6 +14,7 @@ import com.gundi.binance.buylow.config.APIKeyAndSecret;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.Closeable;
 import java.util.List;
 
@@ -25,12 +26,18 @@ public class DevAPIClient extends BaseAPIClient{
 
     @Override
     public void newOrder(NewOrder newOrder) {
+
         this.apiRestClient.newOrderTest(newOrder);
     }
 
     @Override
     public void cancelOrder(CancelOrderRequest cancelOrderRequest) {
         return;
+    }
+
+    @PostConstruct
+    private void postConstruct() {
+        System.err.println("Inside Dev");
     }
 
 

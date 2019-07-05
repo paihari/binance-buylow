@@ -49,8 +49,7 @@ public class BuyService {
                 calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
 
         String lowPrice_str = tickerStatistics.getLowPrice();
-        Double lowPrice = DoubleRounder.round(Double.parseDouble(lowPrice_str),
-                calculationService.getRoundDecimalPerSymbol(aggTradeEvent.getSymbol()));
+
         LocalDateTime lastTradeTime = calculationService.getLastTradeTimePerSymbol(aggTradeEvent.getSymbol());
 
 
@@ -71,7 +70,7 @@ public class BuyService {
 
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
                 apiClient.newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
-                logger.trace("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
+                logger.info("Trade Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
 
             }
         }

@@ -28,6 +28,3 @@ CMD ["java", "-jar", "./buylow-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=pr
 #WORKDIR /app
 #COPY --from=0 /app/*.jar ./
 #CMD ["java", "-jar", "./buylow-0.0.1-SNAPSHOT.jar"]
-
-
-
