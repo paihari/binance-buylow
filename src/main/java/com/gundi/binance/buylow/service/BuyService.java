@@ -26,16 +26,15 @@ public class BuyService {
 
     private APIClient apiClient;
     private CalculationService calculationService;
-
-
-
-
+    private AuditService auditService;
 
     @Autowired
     public BuyService(APIClient apiClient,
-                      CalculationService calculationService) {
+                      CalculationService calculationService,
+                      AuditService auditService) {
         this.apiClient = apiClient;
         this.calculationService = calculationService;
+        this.auditService = auditService;
     }
 
 
@@ -58,8 +57,10 @@ public class BuyService {
             tradeAble = true;
         }
 
-        if (tradeAble && lastPrice_str.compareTo(lowPrice_str) == 0) {
-            logger.trace("Event Occured " + aggTradeEvent + " Price " + lastPrice_str);
+        if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0) {
+            String auditLog = " Buy Event Occured for Symbol " + aggTradeEvent.getSymbol() + " Last Price "
+                    + lastPrice_str + " Time " + LocalDateTime.now() + System.lineSeparator();
+            auditService.addAuditLogs(auditLog);
 
             Double amountNeededForBuyTrade = lastPrice * Double.parseDouble(cryptoPair.getQuantity());
 

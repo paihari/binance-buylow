@@ -35,6 +35,8 @@ public class CalculationService {
 
 
 
+
+
     private Map<String, LocalDateTime> lastTradeTimePerSymbol = new HashMap<String, LocalDateTime>();
 
     @Autowired
@@ -120,7 +122,9 @@ public class CalculationService {
         return roundDecimalPerSymbol.get(symbol);
     }
 
-    public LocalDateTime getLastTradeTimePerSymbol(String symbol) {
+    public LocalDateTime getLastTradeTimePerSymbol(String symbol)
+    {
         return lastTradeTimePerSymbol.get(symbol);
     }
+
 }

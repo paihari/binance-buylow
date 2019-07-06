@@ -1,6 +1,7 @@
 package com.gundi.binance.buylow.controller;
 
 import com.gundi.binance.buylow.config.CryptoPair;
+import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +20,13 @@ public class BuyLowController {
 
     private CalculationService calculationService;
 
+    private AuditService auditService;
+
     @Autowired
-    public BuyLowController(CalculationService calculationService) {
+    public BuyLowController(CalculationService calculationService,
+                            AuditService auditService) {
         this.calculationService = calculationService;
+        this.auditService = auditService;
     }
 
 
@@ -38,7 +43,15 @@ public class BuyLowController {
 
 
         }
+        return  message;
+    }
 
+    @RequestMapping("/audit")
+    public String audit() {
+        String message = "";
+        for(String auditLog: auditService.getAuditLogs()) {
+            message = message.concat(auditLog);
+        }
         return  message;
     }
 }

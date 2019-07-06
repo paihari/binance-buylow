@@ -60,58 +60,54 @@ public class SellService {
 
         Double averagePrice = calculationService.getAveragePricePerSymbol(symbol);
 
-        Double currentPrice = DoubleRounder.round(Double.parseDouble(tickerStatistics.getLastPrice()),
-                calculationService.getRoundDecimalPerSymbol(symbol));
+        if(!Double.isNaN(averagePrice)) {
 
-        logger.trace("Average Price " + averagePrice);
-        logger.trace("Current Price " + currentPrice);
+            Double currentPrice = DoubleRounder.round(Double.parseDouble(tickerStatistics.getLastPrice()),
+                    calculationService.getRoundDecimalPerSymbol(symbol));
 
-        Double percentageChange = (currentPrice - averagePrice)/ averagePrice * 100;
+            Double percentageChange = (currentPrice - averagePrice)/ averagePrice * 100;
 
-        logger.trace("Percentage Price " + percentageChange);
+            List<Order> openOrders = apiClient.
+                    getOpenOrders(new OrderRequest(symbol));
 
-        logger.trace("Throttle profit percentage " + throttleProfitPercentage );
+            // Take Profit
+            if(Double.compare(percentageChange, throttleProfitPercentage) == 1) {
+                if(openOrders.isEmpty()) {
+                    createProfitMarketSellOrder(symbol);
 
-
-        List<Order> openOrders = apiClient.
-                getOpenOrders(new OrderRequest(symbol));
-
-
-        if(percentageChange.compareTo(throttleProfitPercentage) == 1) {
-
-
-            if(openOrders.isEmpty()) {
-                createProfitMarketSellOrder(symbol);
-
-            } else {
-                openOrders.stream().forEach( order -> {
-                    apiClient.cancelOrder(new CancelOrderRequest(symbol,
-                            order.getOrderId()));
-
-                });
-                createProfitMarketSellOrder(symbol);
-            }
-
-        } else {
-            if(openOrders.isEmpty()) {
-                createStopLossOrder(symbol);
-
-            } else {
-                openOrders.stream().forEach(order -> {
-                    Double stopPrice = DoubleRounder.round(averagePrice * throttleLossPercentage, roundDecimalForSymbol);
-
-                    Double orderStopPrice = DoubleRounder.round(Double.parseDouble(order.getStopPrice()),
-                            roundDecimalForSymbol);
-
-
-                    if(orderStopPrice.compareTo(stopPrice) != 0) {
+                } else {
+                    openOrders.stream().forEach( order -> {
                         apiClient.cancelOrder(new CancelOrderRequest(symbol,
                                 order.getOrderId()));
-                        createStopLossOrder(symbol);
-                    }
-                });
 
-            }
+                    });
+                    createProfitMarketSellOrder(symbol);
+                }
+
+            } else {
+
+                if(openOrders.isEmpty()) {
+                    createStopLossOrder(symbol);
+
+                } else {
+                    openOrders.stream().forEach(order -> {
+                        Double stopPrice = DoubleRounder.round(averagePrice * throttleLossPercentage, roundDecimalForSymbol);
+
+                        Double orderStopPrice = DoubleRounder.round(Double.parseDouble(order.getStopPrice()),
+                                roundDecimalForSymbol);
+
+
+                        if(orderStopPrice.compareTo(stopPrice) != 0) {
+                            apiClient.cancelOrder(new CancelOrderRequest(symbol,
+                                    order.getOrderId()));
+                            createStopLossOrder(symbol);
+                        }
+                    });
+
+                }
+
+
+            } // Take Loss Order
 
         }
 
