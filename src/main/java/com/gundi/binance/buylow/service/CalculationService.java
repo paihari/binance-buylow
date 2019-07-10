@@ -32,6 +32,7 @@ public class CalculationService {
     private Map<String, Double> totalQtyPerSymbol = new HashMap<String, Double>();
     private Map<String, Double> averagePricePerSymbol = new HashMap<String, Double>();
     private Map<String, Integer> roundDecimalPerSymbol = new HashMap<String, Integer>();
+    private Map<String, Integer> roundQtyPerSymbol = new HashMap<String, Integer>();
 
 
 
@@ -60,14 +61,16 @@ public class CalculationService {
 
         long lastSellOrderTime = (lastTradedSellOrder.isPresent()) ? lastTradedSellOrder.get().getTime()  : 1561465294471L;
 
+
         List<Trade> activeBuytradeList = allTradeList.stream().filter(trade -> {
             return trade.isBuyer() && trade.getTime() > lastSellOrderTime;
         }).collect(Collectors.toList());
 
 
 
-        totalQtyPerSymbol.put(symbol,
-                activeBuytradeList.stream().mapToDouble(s -> Double.parseDouble(s.getQty())).sum());
+        totalQtyPerSymbol.put(symbol, DoubleRounder.round(activeBuytradeList.stream().mapToDouble(s ->
+                        Double.parseDouble(s.getQty())).sum(), roundQtyPerSymbol.get(symbol)));
+
 
         averagePricePerSymbol.put(symbol, calculateAveragePrice(symbol, activeBuytradeList));
 
@@ -102,6 +105,10 @@ public class CalculationService {
                 if(symbolFilter.getFilterType().compareTo(FilterType.PRICE_FILTER) == 0) {
                     roundDecimalPerSymbol.put(cryptoPair.getPair(),
                             symbolFilter.getTickSize().indexOf('1') -1);
+                }
+                if(symbolFilter.getFilterType().compareTo(FilterType.LOT_SIZE) == 0) {
+                    roundQtyPerSymbol.put(cryptoPair.getPair(),
+                            symbolFilter.getMinQty().indexOf('1') - 1);
                 }
             }
         }

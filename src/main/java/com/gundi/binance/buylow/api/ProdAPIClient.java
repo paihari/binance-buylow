@@ -12,6 +12,7 @@ public class ProdAPIClient extends BaseAPIClient {
 
     @Override
     public void newOrder(NewOrder newOrder) {
+
         this.apiRestClient.newOrder(newOrder);
     }
 
