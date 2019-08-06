@@ -1,12 +1,10 @@
 package com.gundi.binance.buylow;
 
-import com.gundi.binance.buylow.service.BuyLowPrimeService;
-import com.gundi.binance.buylow.service.CalculationService;
-import com.gundi.binance.buylow.service.BuyService;
-import com.gundi.binance.buylow.service.SellService;
+import com.gundi.binance.buylow.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
@@ -22,4 +20,16 @@ public class BuylowApplication {
 
     }
 
-}
+
+    @Bean(name = "helloServiceFactory")
+    public HelloServiceFactory helloFactory() {
+        return new HelloServiceFactory();
+    }
+
+    @Bean(name = "helloServicePython")
+    public HelloService helloServicePython() throws Exception {
+        return helloFactory().getObject();
+    }
+
+
+    }

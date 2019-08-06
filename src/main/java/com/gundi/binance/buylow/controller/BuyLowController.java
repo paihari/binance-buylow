@@ -1,12 +1,21 @@
 package com.gundi.binance.buylow.controller;
 
+import com.binance.api.client.domain.account.Trade;
+import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
+import com.gundi.binance.buylow.service.HelloService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class BuyLowController {
@@ -22,19 +31,24 @@ public class BuyLowController {
 
     private AuditService auditService;
 
+    private APIClient apiClient;
+
     @Autowired
     public BuyLowController(CalculationService calculationService,
-                            AuditService auditService) {
+                            AuditService auditService,
+                            APIClient apiClient
+    ) {
         this.calculationService = calculationService;
         this.auditService = auditService;
+        this.apiClient = apiClient;
     }
 
 
     @RequestMapping("/invoke")
     public String invoke() {
         calculationService.invoke();
-        String message = msg + " from " + env + System. lineSeparator();
-        for(CryptoPair cryptoPair : CryptoPair.values()) {
+        String message = msg + " from " + env + System.lineSeparator();
+        for (CryptoPair cryptoPair : CryptoPair.values()) {
             message = message + " Symbol " + cryptoPair.getPair() +
 
                     " Average Price " + calculationService.getAveragePricePerSymbol(cryptoPair.getPair()) +
@@ -43,15 +57,53 @@ public class BuyLowController {
 
 
         }
-        return  message;
+        return message;
     }
 
     @RequestMapping("/audit")
     public String audit() {
         String message = "";
-        for(String auditLog: auditService.getAuditLogs()) {
+        for (String auditLog : auditService.getAuditLogs()) {
             message = message.concat(auditLog);
         }
-        return  message;
+        return message;
+    }
+
+    @RequestMapping("/calculate")
+    public String calculate() {
+        for (CryptoPair cryptoPair : CryptoPair.values()) {
+            List<Trade> allTrades = apiClient.getMyTrades(cryptoPair.getPair()).stream().filter(trade -> {
+                return trade.getTime() > 1561465294471L;
+            }).collect(Collectors.toList());
+
+
+            Double buyValue = allTrades.stream().filter(trade -> {
+                return trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+            }));
+
+            Double sellValue = allTrades.stream().filter(trade -> {
+                return !trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+            }));
+
+            System.out.println("Symbol " + cryptoPair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
+            System.out.println("Profit/Loss " + (sellValue - buyValue));
+
+
+        }
+        return "";
+
+    }
+
+    @Autowired
+    @Qualifier("helloServicePython")
+    private HelloService service;
+
+    @RequestMapping("/hello")
+    public String index() {
+        return service.getHello();
     }
 }

@@ -66,6 +66,7 @@ public abstract class BaseAPIClient implements APIClient{
 
     @Override
     public List<Trade> getMyTrades(String symbol) {
+
         return this.apiRestClient.getMyTrades(symbol);
     }
 
