@@ -43,7 +43,7 @@ public class BuyLowController {
     @RequestMapping("/invoke")
     public String invoke() {
         calculationService.invoke();
-        String message = msg + " from the" + env + System.lineSeparator();
+        String message = msg + " from the system" + env + System.lineSeparator();
         for (CryptoPair cryptoPair : CryptoPair.values()) {
             message = message + " Symbol " + cryptoPair.getPair() +
 
