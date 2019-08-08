@@ -5,16 +5,12 @@ import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
-import com.gundi.binance.buylow.service.HelloService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -98,12 +94,4 @@ public class BuyLowController {
 
     }
 
-//    @Autowired
-//    @Qualifier("helloServicePython")
-//    private HelloService service;
-//
-//    @RequestMapping("/hello")
-//    public String index() {
-//        return service.getHello();
-//    }
 }
