@@ -21,15 +21,14 @@ public class BuylowApplication {
     }
 
 
-//    @Bean(name = "helloServiceFactory")
-//    public HelloServiceFactory helloFactory() {
-//        return new HelloServiceFactory();
-//    }
-//
-//    @Bean(name = "helloServicePython")
-//    public HelloService helloServicePython() throws Exception {
-//        return helloFactory().getObject();
-//    }
-
-
+    @Bean(name = "helloServiceFactory")
+    public HelloServiceFactory helloFactory() {
+        return new HelloServiceFactory();
     }
+
+    @Bean(name = "helloServicePython")
+    public HelloService helloServicePython() throws Exception {
+        return helloFactory().getObject();
+    }
+
+}

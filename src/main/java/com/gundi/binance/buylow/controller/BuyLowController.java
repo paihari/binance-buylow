@@ -98,12 +98,12 @@ public class BuyLowController {
 
     }
 
-//    @Autowired
-//    @Qualifier("helloServicePython")
-//    private HelloService service;
-//
-//    @RequestMapping("/hello")
-//    public String index() {
-//        return service.getHello();
-//    }
+    @Autowired
+    @Qualifier("helloServicePython")
+    private HelloService service;
+
+    @RequestMapping("/hello")
+    public String index() {
+        return service.getHello();
+    }
 }
