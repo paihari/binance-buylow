@@ -1,4 +1,12 @@
 sudo: required
+
+# blocklist
+branches:
+  except:
+    - dev
+  only:
+    - master
+
 services:
   - docker
 
