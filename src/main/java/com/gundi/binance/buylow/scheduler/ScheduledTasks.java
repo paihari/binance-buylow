@@ -31,8 +31,8 @@ public class ScheduledTasks {
 
 
 
-    //@Scheduled(cron = "${cron.expression}")
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "${cron.expression}")
+    //@Scheduled(fixedRate = 5000)
     public void doIt() {
         analyticsService.invoke("BTCUSDT");
         Boolean idealSituationForBuy = analyticsService.getIsIdealSituationForBuy("BTCUSDT");
