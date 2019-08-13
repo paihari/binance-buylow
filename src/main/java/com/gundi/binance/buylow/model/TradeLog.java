@@ -1,12 +1,12 @@
 package com.gundi.binance.buylow.model;
 
-public class TradeInfo {
+public class TradeLog {
 
     Long tradeTime;
     Boolean isBuyTrade;
     Double tradePrice;
 
-    public TradeInfo(Long tradeTime, Boolean isBuyTrade, Double tradePrice) {
+    public TradeLog(Long tradeTime, Boolean isBuyTrade, Double tradePrice) {
         this.tradeTime = tradeTime;
         this.isBuyTrade = isBuyTrade;
         this.tradePrice = tradePrice;
@@ -38,7 +38,7 @@ public class TradeInfo {
 
     @Override
     public String toString() {
-        return "TradeInfo{" +
+        return "TradeLog{" +
                 "tradeTime=" + tradeTime +
                 ", isBuyTrade=" + isBuyTrade +
                 ", tradePrice=" + tradePrice +
