@@ -3,7 +3,7 @@ package com.gundi.binance.buylow.controller;
 import com.binance.api.client.domain.account.Trade;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
-import com.gundi.binance.buylow.model.TradeInfo;
+import com.gundi.binance.buylow.model.TradeLog;
 import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,23 +72,29 @@ public class BuyLowController {
         LocalDateTime localDate = LocalDateTime.now();
         message = message.concat("The Server Time " + localDate + System.lineSeparator());
 
+        message = message.concat("Average Drop of Red Candles " + auditService.getAverageDropOfRedCandles() + System.lineSeparator());
+        message = message.concat("Average Volume of Red Candles " + auditService.getAverageVolumeOfRedCandles() + System.lineSeparator());
+
+
 
         Integer noOfBuyTrade = auditService.getTradeLogs().size();
         message = message.concat("No Of Trades " + noOfBuyTrade + System.lineSeparator()) ;
 
         Double buyPrice = new Double(0);
 
-        for(TradeInfo tradeInfo: auditService.getTradeLogs()) {
-            if(tradeInfo.getBuyTrade()) {
+        for(TradeLog tradeLog : auditService.getTradeLogs()) {
+            if(tradeLog.getBuyTrade()) {
                 LocalDateTime lastTradeTime =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeInfo.getTradeTime()),
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeLog.getTradeTime()),
                                 ZoneId.systemDefault());
 
-                message = message.concat("Trade Time" + lastTradeTime + " Price " + tradeInfo.getTradePrice() + System.lineSeparator());
-                buyPrice = buyPrice + tradeInfo.getTradePrice();
+                message = message.concat("Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
+                buyPrice = buyPrice + tradeLog.getTradePrice();
             }
-            message = message.concat(" Average Price " + buyPrice/noOfBuyTrade);
+
         }
+        message = message.concat(" Average Price " + buyPrice/noOfBuyTrade);
+
         return message;
     }
 

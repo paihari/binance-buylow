@@ -1,6 +1,6 @@
 package com.gundi.binance.buylow.service;
 
-import com.gundi.binance.buylow.model.TradeInfo;
+import com.gundi.binance.buylow.model.TradeLog;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -11,29 +11,39 @@ import java.util.List;
 @Scope("singleton")
 public class AuditService {
 
-
-    private List<String> auditLogs = new ArrayList<String>();
-
-    private List<TradeInfo> tradeLogs = new ArrayList<TradeInfo>();
+    private List<TradeLog> tradeLogs = new ArrayList<TradeLog>();
+    private Double averageVolumeOfRedCandles = new Double(0);
+    private Double averageDropOfRedCandles = new Double(0);
 
     public AuditService() {
 
     }
 
-    public void addAuditLogs(String auditLog) {
-        this.auditLogs.add(auditLog);
-    }
+    public List<TradeLog> getTradeLogs() {
 
-    public List<TradeInfo> getTradeLogs() {
         return tradeLogs;
     }
 
-    public void addTradeLogs(TradeInfo tradeLog) {
+    public void addTradeLogs(TradeLog tradeLog) {
+
         this.tradeLogs.add(tradeLog);
     }
 
-    public List<String> getAuditLogs () {
-        return auditLogs;
+    public Double getAverageVolumeOfRedCandles() {
+        return averageVolumeOfRedCandles;
     }
+
+    public void setAverageVolumeOfRedCandles(Double averageVolumeOfRedCandles) {
+        this.averageVolumeOfRedCandles = averageVolumeOfRedCandles;
+    }
+
+    public Double getAverageDropOfRedCandles() {
+        return averageDropOfRedCandles;
+    }
+
+    public void setAverageDropOfRedCandles(Double averageDropOfRedCandles) {
+        this.averageDropOfRedCandles = averageDropOfRedCandles;
+    }
+
 
 }

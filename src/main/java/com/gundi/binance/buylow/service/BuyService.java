@@ -1,12 +1,11 @@
 package com.gundi.binance.buylow.service;
 
 import com.binance.api.client.domain.account.NewOrder;
-import com.binance.api.client.domain.account.Trade;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
-import com.gundi.binance.buylow.model.TradeInfo;
+import com.gundi.binance.buylow.model.TradeLog;
 import org.decimal4j.util.DoubleRounder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +40,8 @@ public class BuyService {
     public void tradeIt(String symbol) {
         Long serverTime = apiClient.getServerTime();
         Double buyPrice = Double.parseDouble(apiClient.get24HrPriceStatistics(symbol).getAskPrice());
-        TradeInfo tradeInfo = new TradeInfo(serverTime, true, buyPrice);
-        auditService.addTradeLogs(tradeInfo);
-
-
+        TradeLog tradeLog = new TradeLog(serverTime, true, buyPrice);
+        auditService.addTradeLogs(tradeLog);
     }
 
 
@@ -69,7 +66,6 @@ public class BuyService {
         if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0 && cryptoPair.isKeepOnBuying()) {
             String auditLog = " Buy Event Occured for Symbol " + aggTradeEvent.getSymbol() + " Last Price "
                     + lastPrice_str + " Time " + LocalDateTime.now() + System.lineSeparator();
-            auditService.addAuditLogs(auditLog);
 
             Double amountNeededForBuyTrade = lastPrice * Double.parseDouble(cryptoPair.getQuantity());
 
@@ -80,7 +76,7 @@ public class BuyService {
 
             if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
                 apiClient.newOrder(NewOrder.marketBuy(aggTradeEvent.getSymbol(), cryptoPair.getQuantity()));
-                logger.info("TradeInfo Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
+                logger.info("TradeLog Created for Symbol " + aggTradeEvent.getSymbol()  + " Quantity " + cryptoPair.getQuantity());
 
             }
         }
