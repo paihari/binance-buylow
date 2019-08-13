@@ -11,15 +11,27 @@ import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.general.ExchangeInfo;
+import com.binance.api.client.domain.market.Candlestick;
+import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.gundi.binance.buylow.config.APIKeyAndSecret;
+import com.gundi.binance.buylow.service.AnalyticsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.io.Closeable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public abstract class BaseAPIClient implements APIClient{
+
+    Logger logger = LoggerFactory.getLogger(BaseAPIClient.class);
 
     @Autowired
     private APIKeyAndSecret apiKeyAndSecret;
@@ -80,6 +92,19 @@ public abstract class BaseAPIClient implements APIClient{
         return this.apiRestClient.getOpenOrders(orderRequest);
     }
 
+    public List<Candlestick> getPastFiveDaysCandlestickBars(String symbol, CandlestickInterval candlestickInterval) {
+        Long serverTime = apiRestClient.getServerTime();
 
+        //Long timeThreeDaysBack = serverTime - 120 * 60 * 1000;
 
+        Long timeThreeDaysBack = serverTime - 1 * 24 * 60 * 60 * 1000;
+
+        return this.apiRestClient.getCandlestickBars(symbol, candlestickInterval,
+                500, timeThreeDaysBack,
+                serverTime);
+    }
+
+    public Long getServerTime() {
+        return apiRestClient.getServerTime();
+    }
 }

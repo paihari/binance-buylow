@@ -23,15 +23,18 @@ public class BuyLowPrimeService {
 
     private SellService sellService;
     private BuyService buyService;
+    private  AnalyticsService analyticsService;
 
 
     @Autowired
     public BuyLowPrimeService(APIClient apiClient,
                               SellService sellService,
-                              BuyService buyService) {
+                              BuyService buyService,
+                              AnalyticsService analyticsService) {
         this.apiClient = apiClient;
         this.sellService = sellService;
         this.buyService = buyService;
+        this.analyticsService = analyticsService;
     }
 
 
