@@ -29,8 +29,8 @@ public class APIKeyAndSecretConfig {
 
     private APIKeyAndSecret getSecretForLocal() {
 
-        return new APIKeyAndSecret("I3Q6UYnT7nuJN4pjwkNrrFiqcHN1ihWvD6oV6js94dc5EEyO5Olh8vTqNRVU65LU",
-                "O2CWkYOgFFSX4B8ePnVA0saqVJnRuQyNec74u7f9t2Mfyvqbg8MJo63v90dgoJ9a");
+        return new APIKeyAndSecret("",
+                "");
     }
 
     private APIKeyAndSecret getSecretFromAWSSecretManager() {
