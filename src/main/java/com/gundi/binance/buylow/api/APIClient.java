@@ -9,6 +9,8 @@ import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.general.ExchangeInfo;
+import com.binance.api.client.domain.market.Candlestick;
+import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.domain.market.TickerStatistics;
 
 import java.io.Closeable;
@@ -23,11 +25,14 @@ public interface APIClient {
      TickerStatistics get24HrPriceStatistics(String symbol);
      AssetBalance getAssetBalance(String baseCurrency);
 
-    List<Trade> getMyTrades(String symbol);
+     List<Trade> getMyTrades(String symbol);
 
-    ExchangeInfo getExchangeInfo();
+     ExchangeInfo getExchangeInfo();
 
-    List<Order> getOpenOrders(OrderRequest orderRequest);
+     List<Order> getOpenOrders(OrderRequest orderRequest);
+
+     List<Candlestick> getPastFiveDaysCandlestickBars(String symbol, CandlestickInterval candlestickInterval);
+     Long getServerTime();
 
     //getApiRestClient().getAccount()
 

@@ -9,7 +9,7 @@ import java.util.List;
 public enum CryptoPair implements Serializable{
 
 
-    XRPUSDT("XRPUSDT", "100", "USDT", "XRP", true),
+    XRPUSDT("XRPUSDT", "100", "USDT", "XRP", false),
     BTCUSDT("BTCUSDT", "0.004", "USDT", "BTC", true),
     BNBUSDT("BNBUSDT", "1.2", "USDT", "BNB", true);
 

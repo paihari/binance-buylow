@@ -3,6 +3,7 @@ package com.gundi.binance.buylow.controller;
 import com.binance.api.client.domain.account.Trade;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
+import com.gundi.binance.buylow.model.TradeInfo;
 import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,8 +63,22 @@ public class BuyLowController {
     @RequestMapping("/audit")
     public String audit() {
         String message = "";
-        for (String auditLog : auditService.getAuditLogs()) {
-            message = message.concat(auditLog);
+
+        Integer noOfBuyTrade = auditService.getTradeLogs().size();
+        message = message.concat("No Of Trades " + noOfBuyTrade + System.lineSeparator()) ;
+
+        Double buyPrice = new Double(0);
+
+        for(TradeInfo tradeInfo: auditService.getTradeLogs()) {
+            if(tradeInfo.getBuyTrade()) {
+                LocalDateTime lastTradeTime =
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeInfo.getTradeTime()),
+                                ZoneId.systemDefault());
+
+                message = message.concat("Trade Time" + lastTradeTime + " Price " + tradeInfo.getTradePrice() + System.lineSeparator());
+                buyPrice = buyPrice + tradeInfo.getTradePrice();
+            }
+            message = message.concat(" Average Price " + buyPrice/noOfBuyTrade);
         }
         return message;
     }
