@@ -1,21 +1,15 @@
 package com.gundi.binance.buylow.service;
 
-import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
-import com.binance.api.client.domain.market.TickerStatistics;
 import com.gundi.binance.buylow.api.APIClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AnalyticsService {
@@ -27,6 +21,9 @@ public class AnalyticsService {
     private AuditService auditService;
 
     private Map<String, Boolean> isIdealSituationForBuy = new HashMap<String, Boolean>();
+
+    private Map<String, Boolean> isIdealSituationForSell = new HashMap<String, Boolean>();
+
 
     @Autowired
     public AnalyticsService(APIClient apiClient,
@@ -44,6 +41,53 @@ public class AnalyticsService {
         // Remove the first unfilled Current Candle
         candlesticks.remove(0);
 
+        invokeBuy(symbol, candlesticks);
+        invokeSell(symbol, candlesticks);
+    }
+
+    private void invokeSell(String symbol, List<Candlestick> candlesticks) {
+
+        // Get the Last Candle Stick In Focus
+        Candlestick lastCandlestick = candlesticks.get(0);
+        // Get filtered 20 Candle sticks with Top Drops
+        List<Candlestick> filteredCandleList = candlesticks.stream().filter(candlestick -> {
+            return Double.parseDouble(candlestick.getClose()) > Double.parseDouble(candlestick.getOpen());
+        }).sorted(new SellComparator<Candlestick>()).limit(20).collect(Collectors.toList());
+
+        Double averageVolumeOfGreenCandles =  filteredCandleList.stream().
+                mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
+
+        Double averageRaisePriceOfGreenCandles = filteredCandleList.stream().
+                mapToDouble(s -> {
+                    Double openPrice = Double.parseDouble(s.getOpen());
+                    Double closePrice = Double.parseDouble(s.getClose());
+                    return closePrice - openPrice;
+                }).average().getAsDouble();
+
+        auditService.setAverageRaiseOfGreenCandles(averageRaisePriceOfGreenCandles);
+        auditService.setAverageVolumeOfGreenCandles(averageVolumeOfGreenCandles);
+
+        isIdealSituationForSell.put(symbol, false);
+
+        // Ideal situation to Sell when lastCandle Stick is Green and
+        // Volume of the Last Candle Stick exceeds the average
+        // Raise of the last Candle Stick exceeds the average raise
+        if(Double.parseDouble(lastCandlestick.getClose()) > Double.parseDouble(lastCandlestick.getOpen())
+                &&
+                Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfGreenCandles
+                &&
+                (Double.parseDouble(lastCandlestick.getClose()) - Double.parseDouble(lastCandlestick.getOpen()) > averageRaisePriceOfGreenCandles)
+        )
+        {
+            isIdealSituationForSell.replace(symbol, true);
+        }
+
+
+
+    }
+
+    private void invokeBuy(String symbol, List<Candlestick> candlesticks) {
+
         // Get the Last Candle Stick In Focus
         Candlestick lastCandlestick = candlesticks.get(0);
 
@@ -51,20 +95,7 @@ public class AnalyticsService {
         // Get filtered 20 Candle sticks with Top Drops
         List<Candlestick> filteredCandleList = candlesticks.stream().filter(candlestick -> {
             return Double.parseDouble(candlestick.getClose()) < Double.parseDouble(candlestick.getOpen());
-        }).sorted(new Comparator<Candlestick>() {
-            @Override
-            public int compare(Candlestick o1, Candlestick o2) {
-                Double diff1 = Double.parseDouble(o1.getOpen()) -
-                        Double.parseDouble(o1.getClose());
-                Double diff2 = Double.parseDouble(o2.getOpen()) -
-                        Double.parseDouble(o2.getClose());
-
-                return diff2.compareTo(diff1);
-            }
-        }).limit(20).collect(Collectors.toList());
-
-
-
+        }).sorted(new BuyComparator<Candlestick>()).limit(20).collect(Collectors.toList());
 
         Double averageVolumeOfRedCandles =  filteredCandleList.stream().
                 mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
@@ -89,7 +120,8 @@ public class AnalyticsService {
                 Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfRedCandles
                 &&
                 (Double.parseDouble(lastCandlestick.getOpen()) - Double.parseDouble(lastCandlestick.getClose()) > averageDropPriceOfRedCandles)
-        ) {
+        )
+        {
             isIdealSituationForBuy.replace(symbol, true);
         }
 
@@ -100,4 +132,34 @@ public class AnalyticsService {
     public Boolean getIsIdealSituationForBuy(String symbol) {
         return isIdealSituationForBuy.get(symbol);
     }
+
+    public Boolean getIsIdealSituationForSell(String symbol) {
+        return isIdealSituationForSell.get(symbol);
+    }
+
+
+    class BuyComparator<CandleStick> implements Comparator<Candlestick> {
+        @Override
+        public int compare(Candlestick o1, Candlestick o2) {
+            Double diff1 = Double.parseDouble(o1.getOpen()) -
+                    Double.parseDouble(o1.getClose());
+            Double diff2 = Double.parseDouble(o2.getOpen()) -
+                    Double.parseDouble(o2.getClose());
+
+            return diff2.compareTo(diff1);
+        }
+    }
+
+    class SellComparator<CandleStick> implements Comparator<Candlestick> {
+        @Override
+        public int compare(Candlestick o1, Candlestick o2) {
+            Double diff1 = Double.parseDouble(o1.getClose()) -
+                    Double.parseDouble(o1.getOpen());
+            Double diff2 = Double.parseDouble(o2.getClose()) -
+                    Double.parseDouble(o2.getOpen());
+
+            return diff2.compareTo(diff1);
+        }
+    }
+
 }

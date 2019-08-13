@@ -38,10 +38,26 @@ public class BuyService {
     }
 
     public void tradeIt(String symbol) {
+
+        CryptoPair cryptoPair = CryptoPair.valueOf(symbol);
+
+        Double buyPrice = DoubleRounder.round(Double.parseDouble(apiClient.get24HrPriceStatistics(symbol).getAskPrice()),
+                calculationService.getRoundDecimalPerSymbol(symbol));
+
+        Double amountNeededForBuyTrade = buyPrice * Double.parseDouble(cryptoPair.getQuantity());
+
+        String baseCurrencyAssetBalanceStr =
+                apiClient.getAssetBalance(
+                        cryptoPair.getBaseCurrency()).getFree();
+
+        Double amountInTheAccount = Double.parseDouble(baseCurrencyAssetBalanceStr);
+        if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
+            //apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
+        }
         Long serverTime = apiClient.getServerTime();
-        Double buyPrice = Double.parseDouble(apiClient.get24HrPriceStatistics(symbol).getAskPrice());
         TradeLog tradeLog = new TradeLog(serverTime, true, buyPrice);
         auditService.addTradeLogs(tradeLog);
+
     }
 
 
