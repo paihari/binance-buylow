@@ -64,37 +64,52 @@ public class BuyLowController {
     public String audit() {
         String message = "";
 
-        Long serverTime = apiClient.getServerTime();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(serverTime),
-                ZoneId.systemDefault());
-        message = message.concat("The Exchange Server Time " + localDateTime + System.lineSeparator() );
-
-        LocalDateTime localDate = LocalDateTime.now();
-        message = message.concat("The Server Time " + localDate + System.lineSeparator());
+        Integer noOfTrades = auditService.getTradeLogs().size();
+        message = message.concat("No Of Trades " + noOfTrades + System.lineSeparator()) ;
 
         message = message.concat("Average Drop of Red Candles " + auditService.getAverageDropOfRedCandles() + System.lineSeparator());
         message = message.concat("Average Volume of Red Candles " + auditService.getAverageVolumeOfRedCandles() + System.lineSeparator());
 
-
-
-        Integer noOfBuyTrade = auditService.getTradeLogs().size();
-        message = message.concat("No Of Trades " + noOfBuyTrade + System.lineSeparator()) ;
-
         Double buyPrice = new Double(0);
+        Integer noOfBuyTrade = 0;
+
+        Double sellPrice = new Double(0);
+        Integer noOfSellTrade = 0;
+
 
         for(TradeLog tradeLog : auditService.getTradeLogs()) {
             if(tradeLog.getBuyTrade()) {
+                noOfBuyTrade++;
                 LocalDateTime lastTradeTime =
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeLog.getTradeTime()),
                                 ZoneId.systemDefault());
 
-                message = message.concat("Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
+                message = message.concat("Buy Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
                 buyPrice = buyPrice + tradeLog.getTradePrice();
             }
 
         }
-        message = message.concat(" Average Price " + buyPrice/noOfBuyTrade);
+        message = message.concat(" Average Buy Price " + buyPrice/noOfBuyTrade + System.lineSeparator());
 
+
+        message = message.concat("Average Raise of Green Candles " + auditService.getAverageRaiseOfGreenCandles() + System.lineSeparator());
+        message = message.concat("Average Volume of Green Candles " + auditService.getAverageVolumeOfGreenCandles() + System.lineSeparator());
+
+
+
+        for(TradeLog tradeLog : auditService.getTradeLogs()) {
+            if(!tradeLog.getBuyTrade()) {
+                noOfSellTrade++;
+                LocalDateTime lastTradeTime =
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeLog.getTradeTime()),
+                                ZoneId.systemDefault());
+
+                message = message.concat("Sell Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
+                sellPrice = sellPrice + tradeLog.getTradePrice();
+
+            }
+        }
+        message = message.concat(" Average Sell Price " + sellPrice/noOfSellTrade);
         return message;
     }
 

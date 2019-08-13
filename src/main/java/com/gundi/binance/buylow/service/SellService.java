@@ -10,6 +10,8 @@ import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.gundi.binance.buylow.api.APIClient;
+import com.gundi.binance.buylow.config.CryptoPair;
+import com.gundi.binance.buylow.model.TradeLog;
 import org.decimal4j.util.DoubleRounder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import java.util.List;
 public class SellService {
 
     private CalculationService calculationService;
+    private AuditService auditService;
     private APIClient apiClient;
 
     Logger logger = LoggerFactory.getLogger(SellService.class);
@@ -39,9 +42,32 @@ public class SellService {
     Double throttleStopLimitPercentage;
 
     @Autowired
-    public SellService(APIClient apiClient, CalculationService calculationService) {
+    public SellService(APIClient apiClient,
+                       CalculationService calculationService,
+                       AuditService auditService) {
         this.apiClient = apiClient;
         this.calculationService = calculationService;
+    }
+
+    public void tradeIt(String symbol) {
+        CryptoPair cryptoPair = CryptoPair.valueOf(symbol);
+
+        Double sellPrice = DoubleRounder.round(Double.parseDouble(apiClient.get24HrPriceStatistics(symbol).getBidPrice()),
+                calculationService.getRoundDecimalPerSymbol(symbol));
+
+
+        String tradeCurrencyAssetBalanceStr =
+                apiClient.getAssetBalance(
+                        cryptoPair.getTradeCurrency()).getFree();
+        Double amountNeededForSellTrade = Double.parseDouble(cryptoPair.getQuantity());
+
+        Double amountInTheAccount = Double.parseDouble(tradeCurrencyAssetBalanceStr);
+        if(amountInTheAccount.compareTo(amountNeededForSellTrade) == 1) {
+            //apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
+        }
+        Long serverTime = apiClient.getServerTime();
+        TradeLog tradeLog = new TradeLog(serverTime, false, sellPrice);
+        auditService.addTradeLogs(tradeLog);
     }
 
 

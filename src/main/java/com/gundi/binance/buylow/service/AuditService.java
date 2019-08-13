@@ -12,8 +12,13 @@ import java.util.List;
 public class AuditService {
 
     private List<TradeLog> tradeLogs = new ArrayList<TradeLog>();
+
     private Double averageVolumeOfRedCandles = new Double(0);
     private Double averageDropOfRedCandles = new Double(0);
+
+    private Double averageVolumeOfGreenCandles = new Double(0);
+    private Double averageRaiseOfGreenCandles = new Double(0);
+
 
     public AuditService() {
 
@@ -45,5 +50,19 @@ public class AuditService {
         this.averageDropOfRedCandles = averageDropOfRedCandles;
     }
 
+    public Double getAverageVolumeOfGreenCandles() {
+        return averageVolumeOfGreenCandles;
+    }
 
+    public void setAverageVolumeOfGreenCandles(Double averageVolumeOfGreenCandles) {
+        this.averageVolumeOfGreenCandles = averageVolumeOfGreenCandles;
+    }
+
+    public Double getAverageRaiseOfGreenCandles() {
+        return averageRaiseOfGreenCandles;
+    }
+
+    public void setAverageRaiseOfGreenCandles(Double averageRaiseOfGreenCandles) {
+        this.averageRaiseOfGreenCandles = averageRaiseOfGreenCandles;
+    }
 }

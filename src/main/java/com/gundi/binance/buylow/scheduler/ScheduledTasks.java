@@ -2,6 +2,7 @@ package com.gundi.binance.buylow.scheduler;
 
 import com.gundi.binance.buylow.service.AnalyticsService;
 import com.gundi.binance.buylow.service.BuyService;
+import com.gundi.binance.buylow.service.SellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,15 @@ public class ScheduledTasks {
 
     BuyService buyService;
 
+    SellService sellService;
+
     @Autowired
     public ScheduledTasks(AnalyticsService analyticsService,
-                          BuyService buyService) {
+                          BuyService buyService,
+                          SellService sellService) {
         this.analyticsService = analyticsService;
         this.buyService = buyService;
+        this.sellService = sellService;
     }
 
 
@@ -34,6 +39,11 @@ public class ScheduledTasks {
         logger.info("Ideal Situation for Buy " + idealSituationForBuy);
         if(idealSituationForBuy) {
             buyService.tradeIt("BTCUSDT");
+        }
+        Boolean idealSituationForSell = analyticsService.getIsIdealSituationForSell("BTCUSDT");
+        logger.info("Ideal Situation for Sell " + idealSituationForSell);
+        if(idealSituationForSell) {
+            sellService.tradeIt("BTCUSDT");
         }
 
 
