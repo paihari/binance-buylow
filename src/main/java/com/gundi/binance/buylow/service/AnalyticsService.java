@@ -60,10 +60,10 @@ public class AnalyticsService {
             }
         }).limit(10).mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
 
-
+        isIdealSituationForBuy.put(symbol, false);
         if(Double.parseDouble(lastCandlestick.getOpen()) > Double.parseDouble(lastCandlestick.getClose()) &&
         Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfRedCandles) {
-            isIdealSituationForBuy.put(symbol, true);
+            isIdealSituationForBuy.replace(symbol, true);
         }
 
 
