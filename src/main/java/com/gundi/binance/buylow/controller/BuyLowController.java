@@ -64,6 +64,15 @@ public class BuyLowController {
     public String audit() {
         String message = "";
 
+        Long serverTime = apiClient.getServerTime();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(serverTime),
+                ZoneId.systemDefault());
+        message = message.concat("The Exchange Server Time " + localDateTime + System.lineSeparator() );
+
+        LocalDateTime localDate = LocalDateTime.now();
+        message = message.concat("The Server Time " + localDate + System.lineSeparator());
+
+
         Integer noOfBuyTrade = auditService.getTradeLogs().size();
         message = message.concat("No Of Trades " + noOfBuyTrade + System.lineSeparator()) ;
 
