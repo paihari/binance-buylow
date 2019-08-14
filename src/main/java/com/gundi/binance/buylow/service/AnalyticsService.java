@@ -35,11 +35,7 @@ public class AnalyticsService {
 
     public void invoke(String symbol) {
 
-        String tradeCurrencyAssetBalanceStr =
-                apiClient.getAssetBalance(
-                        "XRP").getFree();
-        logger.info("Balance " + tradeCurrencyAssetBalanceStr);
-        System.exit(0);
+
         List<Candlestick> candlesticks = apiClient.getPastFiveDaysCandlestickBars(symbol,
                 CandlestickInterval.FIFTEEN_MINUTES);
         Collections.reverse(candlesticks);
