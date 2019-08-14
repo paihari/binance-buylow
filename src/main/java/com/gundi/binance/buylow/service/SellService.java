@@ -64,10 +64,10 @@ public class SellService {
         Double amountInTheAccount = Double.parseDouble(tradeCurrencyAssetBalanceStr);
         if(amountInTheAccount.compareTo(amountNeededForSellTrade) == 1) {
             apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
+            Long serverTime = apiClient.getServerTime();
+            TradeLog tradeLog = new TradeLog(serverTime, false, sellPrice);
+            auditService.addTradeLogs(tradeLog);
         }
-        Long serverTime = apiClient.getServerTime();
-        TradeLog tradeLog = new TradeLog(serverTime, false, sellPrice);
-        auditService.addTradeLogs(tradeLog);
     }
 
 
