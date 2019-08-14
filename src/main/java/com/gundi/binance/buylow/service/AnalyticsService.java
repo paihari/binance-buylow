@@ -41,23 +41,22 @@ public class AnalyticsService {
         // Remove the first unfilled Current Candle
         candlesticks.remove(0);
 
-        invokeBuy(symbol, candlesticks);
-        invokeSell(symbol, candlesticks);
+        invoke(symbol, candlesticks);
     }
 
-    private void invokeSell(String symbol, List<Candlestick> candlesticks) {
+    private void invoke(String symbol, List<Candlestick> candlesticks) {
 
         // Get the Last Candle Stick In Focus
         Candlestick lastCandlestick = candlesticks.get(0);
         // Get filtered 20 Candle sticks with Top Drops
-        List<Candlestick> filteredCandleList = candlesticks.stream().filter(candlestick -> {
+        List<Candlestick> filteredGreenCandleList = candlesticks.stream().filter(candlestick -> {
             return Double.parseDouble(candlestick.getClose()) > Double.parseDouble(candlestick.getOpen());
         }).sorted(new SellComparator<Candlestick>()).limit(20).collect(Collectors.toList());
 
-        Double averageVolumeOfGreenCandles =  filteredCandleList.stream().
+        Double averageVolumeOfGreenCandles =  filteredGreenCandleList.stream().
                 mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
 
-        Double averageRaisePriceOfGreenCandles = filteredCandleList.stream().
+        Double averageRaisePriceOfGreenCandles = filteredGreenCandleList.stream().
                 mapToDouble(s -> {
                     Double openPrice = Double.parseDouble(s.getOpen());
                     Double closePrice = Double.parseDouble(s.getClose());
@@ -66,41 +65,18 @@ public class AnalyticsService {
 
         auditService.setAverageRaiseOfGreenCandles(averageRaisePriceOfGreenCandles);
         auditService.setAverageVolumeOfGreenCandles(averageVolumeOfGreenCandles);
-
         isIdealSituationForSell.put(symbol, false);
-
-        // Ideal situation to Sell when lastCandle Stick is Green and
-        // Volume of the Last Candle Stick exceeds the average
-        // Raise of the last Candle Stick exceeds the average raise
-        if(Double.parseDouble(lastCandlestick.getClose()) > Double.parseDouble(lastCandlestick.getOpen())
-                &&
-                Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfGreenCandles
-                &&
-                (Double.parseDouble(lastCandlestick.getClose()) - Double.parseDouble(lastCandlestick.getOpen()) > averageRaisePriceOfGreenCandles)
-        )
-        {
-            isIdealSituationForSell.replace(symbol, true);
-        }
-
-
-
-    }
-
-    private void invokeBuy(String symbol, List<Candlestick> candlesticks) {
-
-        // Get the Last Candle Stick In Focus
-        Candlestick lastCandlestick = candlesticks.get(0);
 
 
         // Get filtered 20 Candle sticks with Top Drops
-        List<Candlestick> filteredCandleList = candlesticks.stream().filter(candlestick -> {
+        List<Candlestick> filteredRedCandleList = candlesticks.stream().filter(candlestick -> {
             return Double.parseDouble(candlestick.getClose()) < Double.parseDouble(candlestick.getOpen());
         }).sorted(new BuyComparator<Candlestick>()).limit(20).collect(Collectors.toList());
 
-        Double averageVolumeOfRedCandles =  filteredCandleList.stream().
+        Double averageVolumeOfRedCandles =  filteredRedCandleList.stream().
                 mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
 
-        Double averageDropPriceOfRedCandles = filteredCandleList.stream().
+        Double averageDropPriceOfRedCandles = filteredRedCandleList.stream().
                 mapToDouble(s -> {
                     Double openPrice = Double.parseDouble(s.getOpen());
                     Double closePrice = Double.parseDouble(s.getClose());
@@ -112,14 +88,35 @@ public class AnalyticsService {
 
         isIdealSituationForBuy.put(symbol, false);
 
+        // Ideal situation to Sell when lastCandle Stick is Green and
+        // Volume of the Last Candle Stick exceeds the average
+        // Raise of the last Candle Stick exceeds the average raise
+        // Average Raise of Green Candles should be higher than Average Drop of Red Candles
+        if(Double.parseDouble(lastCandlestick.getClose()) > Double.parseDouble(lastCandlestick.getOpen())
+                &&
+                Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfGreenCandles
+                &&
+                (Double.parseDouble(lastCandlestick.getClose()) - Double.parseDouble(lastCandlestick.getOpen()) > averageRaisePriceOfGreenCandles)
+                &&
+                averageRaisePriceOfGreenCandles > averageDropPriceOfRedCandles
+        )
+        {
+            isIdealSituationForSell.replace(symbol, true);
+        }
+
+
         // Ideal situation to buy when lastCandle Stick is Red and
         // Volume of the Last Candle Stick exceeds the average
         // Drop of the last Candle Stick exceeds the average drop
+        // Average drop of Red Candles is higher than Average raise to Green Candles
         if(Double.parseDouble(lastCandlestick.getOpen()) > Double.parseDouble(lastCandlestick.getClose())
                 &&
                 Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfRedCandles
                 &&
                 (Double.parseDouble(lastCandlestick.getOpen()) - Double.parseDouble(lastCandlestick.getClose()) > averageDropPriceOfRedCandles)
+                &&
+                averageDropPriceOfRedCandles > averageRaisePriceOfGreenCandles
+
         )
         {
             isIdealSituationForBuy.replace(symbol, true);
@@ -127,7 +124,9 @@ public class AnalyticsService {
 
 
 
+
     }
+
 
     public Boolean getIsIdealSituationForBuy(String symbol) {
         return isIdealSituationForBuy.get(symbol);
