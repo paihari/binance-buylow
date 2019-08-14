@@ -13,7 +13,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        buyLowPrimeService.invoke();
+        //buyLowPrimeService.invoke();
 
     }
 }

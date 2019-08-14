@@ -52,7 +52,7 @@ public class BuyService {
 
         Double amountInTheAccount = Double.parseDouble(baseCurrencyAssetBalanceStr);
         if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
-            //apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
+            apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
         }
         Long serverTime = apiClient.getServerTime();
         TradeLog tradeLog = new TradeLog(serverTime, true, buyPrice);
