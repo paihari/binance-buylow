@@ -26,7 +26,6 @@ public class APIKeyAndSecretConfig {
         return getSecretFromAWSSecretManager();
     }
 
-    //Remove it
 
     private APIKeyAndSecret getSecretForLocal() {
 
