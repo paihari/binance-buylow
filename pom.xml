@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.paihari</groupId>
             <artifactId>binance-java-api</artifactId>
-            <version>1d0eef80cf</version>
+            <version>2027ce5cdf</version>
         </dependency>
 
         <dependency>

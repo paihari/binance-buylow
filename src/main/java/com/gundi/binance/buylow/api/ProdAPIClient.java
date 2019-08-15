@@ -1,6 +1,7 @@
 package com.gundi.binance.buylow.api;
 
 import com.binance.api.client.domain.account.NewOrder;
+import com.binance.api.client.domain.account.NewOrderResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ public class ProdAPIClient extends BaseAPIClient {
     @Override
     public void newOrder(NewOrder newOrder) {
 
-        this.apiRestClient.newOrder(newOrder);
+         this.apiRestClient.newOrder(newOrder);
     }
 
     @PostConstruct

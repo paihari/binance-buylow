@@ -1,7 +1,11 @@
 package com.gundi.binance.buylow.service;
 
 import com.binance.api.client.BinanceApiCallback;
+import com.binance.api.client.domain.TimeInForce;
+import com.binance.api.client.domain.account.NewOrder;
+import com.binance.api.client.domain.account.NewOrderResponse;
 import com.binance.api.client.domain.account.Trade;
+import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
@@ -37,6 +41,15 @@ public class BuyLowPrimeService {
         this.analyticsService = analyticsService;
     }
 
+//    public void testUpgrade() {
+//        String pair = "XRPUSDT";
+//
+//        NewOrderResponse newOrderResponse = apiClient.newOrder(
+//                NewOrder.limitSell(pair, TimeInForce.GTC, "500", "0.29"));
+//        logger.info("New Order Response " + newOrderResponse.getClientOrderId());
+//
+//
+//    }
 
 
     public void invoke() {
