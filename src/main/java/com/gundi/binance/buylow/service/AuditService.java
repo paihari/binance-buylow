@@ -4,65 +4,78 @@ import com.gundi.binance.buylow.model.TradeLog;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Scope("singleton")
 public class AuditService {
 
-    private List<TradeLog> tradeLogs = new ArrayList<TradeLog>();
 
-    private Double averageVolumeOfRedCandles = new Double(0);
-    private Double averageDropOfRedCandles = new Double(0);
+    private Map<String, List<TradeLog>> mapOfTradeLogsPerSymbol = new HashMap<String, List<TradeLog>>();
 
-    private Double averageVolumeOfGreenCandles = new Double(0);
-    private Double averageRaiseOfGreenCandles = new Double(0);
+    private Map<String, Double> averageVolumeOfRedCandlesPerSymbol = new HashMap<String, Double>();
+
+
+    private Map<String, Double> averageDropOfRedCandlesPerSymbol = new HashMap<String, Double>();
+
+
+    private Map<String, Double> averageVolumeOfGreenCandlesPerSymbol = new HashMap<String, Double>();
+
+
+    private Map<String, Double> averageRaiseOfGreenCandlesPerSymbol = new HashMap<String, Double>();
 
 
     public AuditService() {
 
     }
 
-    public List<TradeLog> getTradeLogs() {
 
-        return tradeLogs;
+    public  Double getAverageVolumeOfRedCandlesPerSymbol(String symbol) {
+        return averageVolumeOfRedCandlesPerSymbol.get(symbol);
     }
 
-    public void addTradeLogs(TradeLog tradeLog) {
+    public void setAverageVolumeOfRedCandlesPerSymbol(String symbol,
+                                                      Double averageVolumeOfRedCandles) {
 
-        this.tradeLogs.add(tradeLog);
+        averageVolumeOfRedCandlesPerSymbol.put(symbol, averageVolumeOfRedCandles);
     }
 
-    public Double getAverageVolumeOfRedCandles() {
-        return averageVolumeOfRedCandles;
+    public Double getAverageDropOfRedCandlesPerSymbol(String symbol) {
+        return averageDropOfRedCandlesPerSymbol.get(symbol);
     }
 
-    public void setAverageVolumeOfRedCandles(Double averageVolumeOfRedCandles) {
-        this.averageVolumeOfRedCandles = averageVolumeOfRedCandles;
+    public void setAverageDropOfRedCandlesPerSymbol(String symbol, Double averageDropOfRedCandles) {
+        averageDropOfRedCandlesPerSymbol.put(symbol, averageDropOfRedCandles);
     }
 
-    public Double getAverageDropOfRedCandles() {
-        return averageDropOfRedCandles;
+    public Double getAverageVolumeOfGreenCandlesPerSymbol(String symbol) {
+        return averageVolumeOfGreenCandlesPerSymbol.get(symbol);
     }
 
-    public void setAverageDropOfRedCandles(Double averageDropOfRedCandles) {
-        this.averageDropOfRedCandles = averageDropOfRedCandles;
+    public void setAverageVolumeOfGreenCandlesPerSymbol(String symbol, Double averageVolumeOfGreenCandles) {
+        this.averageVolumeOfGreenCandlesPerSymbol.put(symbol, averageVolumeOfGreenCandles);
     }
 
-    public Double getAverageVolumeOfGreenCandles() {
-        return averageVolumeOfGreenCandles;
+    public Double getAverageRaiseOfGreenCandlesPerSymbol(String symbol) {
+        return averageRaiseOfGreenCandlesPerSymbol.get(symbol);
     }
 
-    public void setAverageVolumeOfGreenCandles(Double averageVolumeOfGreenCandles) {
-        this.averageVolumeOfGreenCandles = averageVolumeOfGreenCandles;
+    public void setAverageRaiseOfGreenCandlesPerSymbol(String symbol, Double averageRaiseOfGreenCandles) {
+        this.averageRaiseOfGreenCandlesPerSymbol.put(symbol, averageRaiseOfGreenCandles);
     }
 
-    public Double getAverageRaiseOfGreenCandles() {
-        return averageRaiseOfGreenCandles;
+    public List<TradeLog> getMapOfTradeLogsPerSymbol(String symbol) {
+        return mapOfTradeLogsPerSymbol.get(symbol);
     }
 
-    public void setAverageRaiseOfGreenCandles(Double averageRaiseOfGreenCandles) {
-        this.averageRaiseOfGreenCandles = averageRaiseOfGreenCandles;
+    public void setMapOfTradeLogsPerSymbol(String symbol, TradeLog tradeLog) {
+
+        if(this.mapOfTradeLogsPerSymbol.get(symbol).isEmpty()) {
+            this.mapOfTradeLogsPerSymbol.put(symbol, Arrays.asList(tradeLog));
+        }
+        else {
+            this.mapOfTradeLogsPerSymbol.get(symbol).add(tradeLog);
+        }
+
     }
 }
