@@ -5,11 +5,14 @@ public class TradeLog {
     Long tradeTime;
     Boolean isBuyTrade;
     Double tradePrice;
+    String symbol;
 
-    public TradeLog(Long tradeTime, Boolean isBuyTrade, Double tradePrice) {
+    public TradeLog(Long tradeTime, Boolean isBuyTrade, Double tradePrice,
+    String symbol) {
         this.tradeTime = tradeTime;
         this.isBuyTrade = isBuyTrade;
         this.tradePrice = tradePrice;
+        this.symbol = symbol;
     }
 
     public Long getTradeTime() {
@@ -36,12 +39,21 @@ public class TradeLog {
         this.tradePrice = tradePrice;
     }
 
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
     @Override
     public String toString() {
         return "TradeLog{" +
                 "tradeTime=" + tradeTime +
                 ", isBuyTrade=" + isBuyTrade +
                 ", tradePrice=" + tradePrice +
+                ", symbol=" + symbol+
                 '}';
     }
 }

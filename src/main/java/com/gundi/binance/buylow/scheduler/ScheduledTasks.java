@@ -1,5 +1,6 @@
 package com.gundi.binance.buylow.scheduler;
 
+import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.service.AnalyticsService;
 import com.gundi.binance.buylow.service.BuyService;
 import com.gundi.binance.buylow.service.SellService;
@@ -34,16 +35,20 @@ public class ScheduledTasks {
     @Scheduled(cron = "${cron.expression}")
     //@Scheduled(fixedRate = 5000)
     public void doIt() {
-        analyticsService.invoke("BTCUSDT");
-        Boolean idealSituationForBuy = analyticsService.getIsIdealSituationForBuy("BTCUSDT");
-        logger.info("Ideal Situation for Buy " + idealSituationForBuy);
-        if(idealSituationForBuy) {
-            buyService.tradeIt("BTCUSDT");
-        }
-        Boolean idealSituationForSell = analyticsService.getIsIdealSituationForSell("BTCUSDT");
-        logger.info("Ideal Situation for Sell " + idealSituationForSell);
-        if(idealSituationForSell) {
-            sellService.tradeIt("BTCUSDT");
+
+        for(CryptoPair cryptoPair : CryptoPair.values()) {
+            analyticsService.invoke(cryptoPair.getPair());
+            Boolean idealSituationForBuy = analyticsService.getIsIdealSituationForBuy(cryptoPair.getPair());
+            logger.info("Ideal Situation for Buy " + idealSituationForBuy + " For " + cryptoPair.getPair());
+            if(idealSituationForBuy) {
+                buyService.tradeIt(cryptoPair.getPair());
+            }
+            Boolean idealSituationForSell = analyticsService.getIsIdealSituationForSell(cryptoPair.getPair());
+            logger.info("Ideal Situation for Sell " + idealSituationForSell + " For " + cryptoPair.getPair());
+            if(idealSituationForSell) {
+                sellService.tradeIt(cryptoPair.getPair());
+            }
+
         }
 
 

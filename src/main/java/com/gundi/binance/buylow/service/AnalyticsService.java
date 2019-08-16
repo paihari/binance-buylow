@@ -64,8 +64,10 @@ public class AnalyticsService {
                     return closePrice - openPrice;
                 }).average().getAsDouble();
 
-        auditService.setAverageRaiseOfGreenCandles(averageRaisePriceOfGreenCandles);
-        auditService.setAverageVolumeOfGreenCandles(averageVolumeOfGreenCandles);
+        auditService.setAverageRaiseOfGreenCandlesPerSymbol(symbol, averageRaisePriceOfGreenCandles);
+        auditService.setAverageVolumeOfGreenCandlesPerSymbol(symbol, averageVolumeOfGreenCandles);
+        logger.trace("AverageRaiseOfGreenCandles " + averageRaisePriceOfGreenCandles + " Symbol " + symbol);
+        logger.trace("AverageVolumeOfGreenCandles " + averageVolumeOfGreenCandles + " Symbol " + symbol) ;
         isIdealSituationForSell.put(symbol, false);
 
 
@@ -84,8 +86,12 @@ public class AnalyticsService {
                     return openPrice - closePrice;
                 }).average().getAsDouble();
 
-        auditService.setAverageDropOfRedCandles(averageDropPriceOfRedCandles);
-        auditService.setAverageVolumeOfRedCandles(averageVolumeOfRedCandles);
+        auditService.setAverageDropOfRedCandlesPerSymbol(symbol, averageDropPriceOfRedCandles);
+        auditService.setAverageVolumeOfRedCandlesPerSymbol(symbol, averageVolumeOfRedCandles);
+        logger.trace("AverageDropPriceOfRedCandles " + averageDropPriceOfRedCandles + " Symbol " + symbol);
+        logger.trace("AverageVolumeOfRedCandles " + averageVolumeOfRedCandles + " Symbol " + symbol) ;
+
+
 
         isIdealSituationForBuy.put(symbol, false);
 
