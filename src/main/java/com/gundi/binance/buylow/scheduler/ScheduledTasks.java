@@ -32,8 +32,8 @@ public class ScheduledTasks {
 
 
 
-    //@Scheduled(cron = "${cron.expression}")
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(cron = "${cron.expression}")
+    //@Scheduled(fixedRate = 300000)
     public void doIt() {
 
         for(CryptoPair cryptoPair : CryptoPair.values()) {

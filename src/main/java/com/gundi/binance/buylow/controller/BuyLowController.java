@@ -114,8 +114,25 @@ public class BuyLowController {
 
                     }
                 }
-                message = message.concat(" Average Sell Price " + sellPrice/noOfSellTrade);
+                message = message.concat(" Average Sell Price " + sellPrice/noOfSellTrade + System.lineSeparator());
             }
+
+
+            List<Trade> allTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
+                return trade.getTime() > 1566198894965L;
+            }).collect(Collectors.toList());
+
+            for (Trade trade : allTrades) {
+                LocalDateTime lastTradeTime =
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(trade.getTime()),
+                                ZoneId.systemDefault());
+                String type = trade.isBuyer() ? "BUY" : "SELL";
+
+                message = message.concat("Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime + System.lineSeparator());
+            }
+
+
+
         }
         return message;
     }
