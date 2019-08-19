@@ -67,7 +67,7 @@ public class BuyLowController {
 
         for(CryptoPair pair: CryptoPair.values()) {
 
-
+            message = message.concat(System.lineSeparator());
             message = message.concat("Average Drop of Red Candles for " + pair.getPair() + "   " + auditService.getAverageDropOfRedCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
             message = message.concat("Average Volume of Red Candles for " + pair.getPair() + "   " + auditService.getAverageVolumeOfRedCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
             message = message.concat(System.lineSeparator());
@@ -128,12 +128,36 @@ public class BuyLowController {
                                 ZoneId.systemDefault());
                 String type = trade.isBuyer() ? "BUY" : "SELL";
 
-                message = message.concat("Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime + System.lineSeparator());
+                message = message.concat("Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime + System.lineSeparator());
+
             }
+            message = message.concat(System.lineSeparator());
+
+            Double buyValue = allTrades.stream().filter(trade -> {
+                return trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+            }));
+
+            Double sellValue = allTrades.stream().filter(trade -> {
+                return !trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+            }));
+
+            message = message.concat("Symbol " + pair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
+            message = message.concat(System.lineSeparator());
+            message = message.concat("Symbol " + pair.getPair() + " Profit/Loss " + + (sellValue - buyValue));
+
+            message = message.concat(System.lineSeparator());
+
+
+
 
 
 
         }
+        message = message.concat(System.lineSeparator());
         return message;
     }
 
