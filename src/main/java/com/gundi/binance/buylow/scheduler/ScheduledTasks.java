@@ -40,12 +40,12 @@ public class ScheduledTasks {
             analyticsService.invoke(cryptoPair.getPair());
             Boolean idealSituationForBuy = analyticsService.getIsIdealSituationForBuy(cryptoPair.getPair());
             logger.info("Ideal Situation for Buy " + idealSituationForBuy + " For " + cryptoPair.getPair());
-            if(idealSituationForBuy) {
+            if(idealSituationForBuy && cryptoPair.isKeepTrading()) {
                 buyService.tradeIt(cryptoPair.getPair());
             }
             Boolean idealSituationForSell = analyticsService.getIsIdealSituationForSell(cryptoPair.getPair());
             logger.info("Ideal Situation for Sell " + idealSituationForSell + " For " + cryptoPair.getPair());
-            if(idealSituationForSell) {
+            if(idealSituationForSell && cryptoPair.isKeepTrading()) {
                 sellService.tradeIt(cryptoPair.getPair());
             }
 
