@@ -70,7 +70,9 @@ public class AuditService {
 
     public void setMapOfTradeLogsPerSymbol(String symbol, TradeLog tradeLog) {
 
-        if(this.mapOfTradeLogsPerSymbol.get(symbol).isEmpty()) {
+        if(this.mapOfTradeLogsPerSymbol.get(symbol) == null ||
+                this.mapOfTradeLogsPerSymbol.get(symbol).isEmpty()) {
+            this.mapOfTradeLogsPerSymbol.put(symbol, new ArrayList<>());
             this.mapOfTradeLogsPerSymbol.put(symbol, Arrays.asList(tradeLog));
         }
         else {

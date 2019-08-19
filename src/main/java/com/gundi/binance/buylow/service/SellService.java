@@ -47,6 +47,7 @@ public class SellService {
                        AuditService auditService) {
         this.apiClient = apiClient;
         this.calculationService = calculationService;
+        this.auditService = auditService;
     }
 
     public void tradeIt(String symbol) {
@@ -63,7 +64,7 @@ public class SellService {
 
         Double amountInTheAccount = Double.parseDouble(tradeCurrencyAssetBalanceStr);
         if(amountInTheAccount.compareTo(amountNeededForSellTrade) == 1) {
-            apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
+            apiClient.newOrder(NewOrder.marketSell(symbol, cryptoPair.getQuantity()));
             Long serverTime = apiClient.getServerTime();
             TradeLog tradeLog = new TradeLog(serverTime, false, sellPrice, symbol);
             auditService.setMapOfTradeLogsPerSymbol(symbol, tradeLog);
