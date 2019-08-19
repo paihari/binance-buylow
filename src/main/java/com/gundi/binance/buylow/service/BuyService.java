@@ -81,7 +81,7 @@ public class BuyService {
             tradeAble = true;
         }
 
-        if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0 && cryptoPair.isKeepOnBuying()) {
+        if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0 && cryptoPair.isKeepTrading()) {
             String auditLog = " Buy Event Occured for Symbol " + aggTradeEvent.getSymbol() + " Last Price "
                     + lastPrice_str + " Time " + LocalDateTime.now() + System.lineSeparator();
 
