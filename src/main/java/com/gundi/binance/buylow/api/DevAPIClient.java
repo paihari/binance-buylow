@@ -24,7 +24,7 @@ public class DevAPIClient extends BaseAPIClient{
     @Override
     public void newOrder(NewOrder newOrder) {
 
-         this.apiRestClient.newOrderTest(newOrder);
+         this.apiRestClient.newOrder(newOrder);
 
     }
 
