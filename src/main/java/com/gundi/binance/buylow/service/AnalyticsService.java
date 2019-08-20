@@ -40,7 +40,6 @@ public class AnalyticsService {
                 CandlestickInterval.FIFTEEN_MINUTES);
         Collections.reverse(candlesticks);
         // Remove the first unfilled Current Candle
-        candlesticks.remove(1);
         candlesticks.remove(0);
 
         invoke(symbol, candlesticks);
