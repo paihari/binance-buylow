@@ -75,49 +75,6 @@ public class BuyLowController {
             message = message.concat("Average Volume of Green Candles " + pair.getPair() + "   " + auditService.getAverageVolumeOfGreenCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
             message = message.concat(System.lineSeparator());
 
-            Double buyPrice = new Double(0);
-            Integer noOfBuyTrade = 0;
-
-            Double sellPrice = new Double(0);
-            Integer noOfSellTrade = 0;
-
-            Integer noOfTrades = 0;
-            if(auditService.getMapOfTradeLogsPerSymbol(pair.getPair()) != null) {
-                noOfTrades = auditService.getMapOfTradeLogsPerSymbol(pair.getPair()).size();
-                message = message.concat("No Of Trades " + noOfTrades + System.lineSeparator()) ;
-                for(TradeLog tradeLog : auditService.getMapOfTradeLogsPerSymbol(pair.getPair())) {
-                    if(tradeLog.getBuyTrade()) {
-                        noOfBuyTrade++;
-                        LocalDateTime lastTradeTime =
-                                LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeLog.getTradeTime()),
-                                        ZoneId.systemDefault());
-
-                        message = message.concat("Symbol " + tradeLog.getSymbol()  +" Buy Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
-                        buyPrice = buyPrice + tradeLog.getTradePrice();
-                    }
-
-                }
-                message = message.concat(" Average Buy Price " + buyPrice/noOfBuyTrade + System.lineSeparator());
-
-
-
-
-                for(TradeLog tradeLog : auditService.getMapOfTradeLogsPerSymbol(pair.getPair())) {
-                    if(!tradeLog.getBuyTrade()) {
-                        noOfSellTrade++;
-                        LocalDateTime lastTradeTime =
-                                LocalDateTime.ofInstant(Instant.ofEpochMilli(tradeLog.getTradeTime()),
-                                        ZoneId.systemDefault());
-
-                        message = message.concat("Symbol " + tradeLog.getSymbol() + " Sell Trade Time " + lastTradeTime + " Price " + tradeLog.getTradePrice() + System.lineSeparator());
-                        sellPrice = sellPrice + tradeLog.getTradePrice();
-
-                    }
-                }
-                message = message.concat(" Average Sell Price " + sellPrice/noOfSellTrade + System.lineSeparator());
-            }
-
-
             List<Trade> allTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
                 return trade.getTime() > 1566198894965L;
             }).collect(Collectors.toList());
@@ -139,22 +96,45 @@ public class BuyLowController {
                 return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
             }));
 
+            Double averageBuyPrice = allTrades.stream().filter(trade -> {
+                return trade.isBuyer();
+            }).mapToDouble(trade -> {
+                        return Double.parseDouble(trade.getPrice());
+            }).average().orElse(0);
+
+
+            Long noOfBuyTrades = allTrades.stream().filter(trade -> {
+                return trade.isBuyer();
+            }).count();
+
+
+
+
             Double sellValue = allTrades.stream().filter(trade -> {
                 return !trade.isBuyer();
             }).collect(Collectors.summingDouble(trade -> {
                 return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
             }));
 
+            Double averageSellPrice = allTrades.stream().filter(trade -> {
+                return !trade.isBuyer();
+            }).mapToDouble(trade -> {
+                return Double.parseDouble(trade.getPrice());
+            }).average().orElse(0);
+
+            Long noOfSellTrades = allTrades.stream().filter(trade -> {
+                return !trade.isBuyer();
+            }).count();
+
+
+            message = message.concat("Symbol " + pair.getPair() + " Average Buy Price " + averageBuyPrice + " Average Sell Price " + averageSellPrice) + System.lineSeparator();
+            message = message.concat("Symbol " + pair.getPair() + " Number Of Buy Trades " + noOfBuyTrades + " No Of Sell Trades  " + noOfSellTrades + System.lineSeparator());
             message = message.concat("Symbol " + pair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
+
             message = message.concat(System.lineSeparator());
             message = message.concat("Symbol " + pair.getPair() + " Profit/Loss " + + (sellValue - buyValue));
 
             message = message.concat(System.lineSeparator());
-
-
-
-
-
 
         }
         message = message.concat(System.lineSeparator());

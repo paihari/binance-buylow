@@ -11,7 +11,6 @@ import java.util.*;
 public class AuditService {
 
 
-    private Map<String, List<TradeLog>> mapOfTradeLogsPerSymbol = new HashMap<String, List<TradeLog>>();
 
     private Map<String, Double> averageVolumeOfRedCandlesPerSymbol = new HashMap<String, Double>();
 
@@ -64,20 +63,4 @@ public class AuditService {
         this.averageRaiseOfGreenCandlesPerSymbol.put(symbol, averageRaiseOfGreenCandles);
     }
 
-    public List<TradeLog> getMapOfTradeLogsPerSymbol(String symbol) {
-        return mapOfTradeLogsPerSymbol.get(symbol);
-    }
-
-    public void setMapOfTradeLogsPerSymbol(String symbol, TradeLog tradeLog) {
-
-        if(this.mapOfTradeLogsPerSymbol.get(symbol) == null ||
-                this.mapOfTradeLogsPerSymbol.get(symbol).isEmpty()) {
-            this.mapOfTradeLogsPerSymbol.put(symbol, new ArrayList<>());
-            this.mapOfTradeLogsPerSymbol.put(symbol, Arrays.asList(tradeLog));
-        }
-        else {
-            this.mapOfTradeLogsPerSymbol.get(symbol).add(tradeLog);
-        }
-
-    }
 }
