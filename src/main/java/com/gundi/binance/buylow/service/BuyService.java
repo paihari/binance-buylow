@@ -54,8 +54,7 @@ public class BuyService {
         if(amountInTheAccount.compareTo(amountNeededForBuyTrade) == 1) {
             apiClient.newOrder(NewOrder.marketBuy(symbol, cryptoPair.getQuantity()));
             Long serverTime = apiClient.getServerTime();
-            TradeLog tradeLog = new TradeLog(serverTime, true, buyPrice, symbol);
-            auditService.setMapOfTradeLogsPerSymbol(symbol, tradeLog);
+
 
         }
 
