@@ -85,7 +85,7 @@ public class BuyLowController {
                                 ZoneId.systemDefault());
                 String type = trade.isBuyer() ? "BUY" : "SELL";
 
-                message = message.concat("Trade Time  "  + trade.getTime() + "Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime  + " Qty " + trade.getQty() + System.lineSeparator());
+                message = message.concat("Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime  + " Qty " + trade.getQty() + System.lineSeparator());
 
             }
             message = message.concat(System.lineSeparator());
