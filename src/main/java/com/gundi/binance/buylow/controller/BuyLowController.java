@@ -76,7 +76,7 @@ public class BuyLowController {
             message = message.concat(System.lineSeparator());
 
             List<Trade> allTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
-                return trade.getTime() > 1566198894965L;
+                return trade.getTime() > 1566359220912L;
             }).collect(Collectors.toList());
 
             for (Trade trade : allTrades) {
@@ -85,7 +85,7 @@ public class BuyLowController {
                                 ZoneId.systemDefault());
                 String type = trade.isBuyer() ? "BUY" : "SELL";
 
-                message = message.concat("Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime + System.lineSeparator());
+                message = message.concat("Trade Time  "  + trade.getTime() + "Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime  + " Qty " + trade.getQty() + System.lineSeparator());
 
             }
             message = message.concat(System.lineSeparator());
@@ -94,6 +94,12 @@ public class BuyLowController {
                 return trade.isBuyer();
             }).collect(Collectors.summingDouble(trade -> {
                 return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+            }));
+
+            Double buyQuantity = allTrades.stream().filter(trade -> {
+                return trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty());
             }));
 
             Double averageBuyPrice = allTrades.stream().filter(trade -> {
@@ -116,6 +122,12 @@ public class BuyLowController {
                 return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
             }));
 
+            Double sellQuantity = allTrades.stream().filter(trade -> {
+                return !trade.isBuyer();
+            }).collect(Collectors.summingDouble(trade -> {
+                return Double.parseDouble(trade.getQty());
+            }));
+
             Double averageSellPrice = allTrades.stream().filter(trade -> {
                 return !trade.isBuyer();
             }).mapToDouble(trade -> {
@@ -129,7 +141,9 @@ public class BuyLowController {
 
             message = message.concat("Symbol " + pair.getPair() + " Average Buy Price " + averageBuyPrice + " Average Sell Price " + averageSellPrice) + System.lineSeparator();
             message = message.concat("Symbol " + pair.getPair() + " Number Of Buy Trades " + noOfBuyTrades + " No Of Sell Trades  " + noOfSellTrades + System.lineSeparator());
-            message = message.concat("Symbol " + pair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
+            message = message.concat("Symbol " + pair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue + System.lineSeparator());
+            message = message.concat("Symbol " + pair.getPair() + " Buy Quantity " + buyQuantity + " Sell Quantity " + sellQuantity);
+
 
             message = message.concat(System.lineSeparator());
             message = message.concat("Symbol " + pair.getPair() + " Profit/Loss " + + (sellValue - buyValue));
@@ -143,29 +157,38 @@ public class BuyLowController {
 
     @RequestMapping("/calculate")
     public String calculate() {
-        for (CryptoPair cryptoPair : CryptoPair.values()) {
-            List<Trade> allTrades = apiClient.getMyTrades(cryptoPair.getPair()).stream().filter(trade -> {
-                return trade.getTime() > 1561465294471L;
-            }).collect(Collectors.toList());
 
+        List<Trade> listOfTrade = apiClient.getMyTrades("BNBUSDT");
 
-            Double buyValue = allTrades.stream().filter(trade -> {
-                return trade.isBuyer();
-            }).collect(Collectors.summingDouble(trade -> {
-                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
-            }));
-
-            Double sellValue = allTrades.stream().filter(trade -> {
-                return !trade.isBuyer();
-            }).collect(Collectors.summingDouble(trade -> {
-                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
-            }));
-
-            System.out.println("Symbol " + cryptoPair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
-            System.out.println("Profit/Loss " + (sellValue - buyValue));
-
-
+        for(Trade trade : listOfTrade) {
+            System.out.println(trade);
         }
+
+//        for (CryptoPair cryptoPair : CryptoPair.values()) {
+//            List<Trade> allTrades = apiClient.getMyTrades(cryptoPair.getPair()).stream().filter(trade -> {
+//                return trade.getTime() > 1561465294471L;
+//            }).collect(Collectors.toList());
+//
+//
+//            Double buyValue = allTrades.stream().filter(trade -> {
+//                return trade.isBuyer();
+//            }).collect(Collectors.summingDouble(trade -> {
+//                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+//            }));
+//
+//            Double sellValue = allTrades.stream().filter(trade -> {
+//                return !trade.isBuyer();
+//            }).collect(Collectors.summingDouble(trade -> {
+//                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
+//            }));
+//
+//            System.out.println("Symbol " + cryptoPair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
+//            System.out.println("Profit/Loss " + (sellValue - buyValue));
+//
+//
+//        }
+
+
         return "";
 
     }
