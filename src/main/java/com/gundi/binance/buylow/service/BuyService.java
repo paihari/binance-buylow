@@ -5,7 +5,6 @@ import com.binance.api.client.domain.event.AggTradeEvent;
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
-import com.gundi.binance.buylow.model.TradeLog;
 import org.decimal4j.util.DoubleRounder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class BuyService {
             tradeAble = true;
         }
 
-        if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0 && cryptoPair.isKeepTrading()) {
+        if (tradeAble  && lastPrice_str.compareTo(lowPrice_str) == 0 && cryptoPair.isKeepBuying()) {
             String auditLog = " Buy Event Occured for Symbol " + aggTradeEvent.getSymbol() + " Last Price "
                     + lastPrice_str + " Time " + LocalDateTime.now() + System.lineSeparator();
 

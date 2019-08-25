@@ -9,8 +9,10 @@ public enum CryptoPair implements Serializable{
 
 
     //XRPUSDT("XRPUSDT", "100", "USDT", "XRP", false),
-    BTCUSDT("BTCUSDT", "0.005", "USDT", "BTC", true),
-    BNBUSDT("BNBUSDT", "1.2", "USDT", "BNB", true);
+    BTCUSDT("BTCUSDT", "0.005", "USDT", "BTC", true, true),
+    BNBUSDT("BNBUSDT", "1.2", "USDT", "BNB", true, true),
+    ETHUSDT("ETHUSDT", "2.5", "USDT", "ETH", false, true);
+
 
 
 
@@ -18,7 +20,8 @@ public enum CryptoPair implements Serializable{
     private String quantity;
     private String baseCurrency;
     private String tradeCurrency;
-    private boolean keepTrading;
+    private boolean keepBuying;
+    private boolean keepSelling;
 
 
 
@@ -27,12 +30,14 @@ public enum CryptoPair implements Serializable{
     CryptoPair(String pair, String quantity,
                String baseCurrency, String tradeCurrency,
 
-               boolean keepTrading) {
+               boolean keepBuying,
+                boolean keepSelling) {
         this.pair = pair;
         this.quantity = quantity;
         this.baseCurrency = baseCurrency;
         this.tradeCurrency = tradeCurrency;
-        this.keepTrading = keepTrading;
+        this.keepBuying = keepBuying;
+        this.keepSelling = keepSelling;
 
     }
 
@@ -53,9 +58,14 @@ public enum CryptoPair implements Serializable{
     }
 
 
-    public boolean isKeepTrading() {
-        return keepTrading;
+    public boolean isKeepBuying() {
+        return keepBuying;
     }
+
+    public boolean isKeepSelling() {
+        return keepSelling;
+    }
+
 
 
     public static String getPairsAsString() {
