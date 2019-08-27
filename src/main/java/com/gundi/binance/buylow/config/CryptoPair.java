@@ -11,7 +11,7 @@ public enum CryptoPair implements Serializable{
     //XRPUSDT("XRPUSDT", "100", "USDT", "XRP", false),
     BTCUSDT("BTCUSDT", "0.04", "USDT", "BTC", true, true),
     //BNBUSDT("BNBUSDT", "1.2", "USDT", "BNB", true, true),
-    ETHUSDT("ETHUSDT", "2", "USDT", "ETH", true, true);
+    ETHUSDT("ETHUSDT", "5", "USDT", "ETH", true, true);
 
 
 
