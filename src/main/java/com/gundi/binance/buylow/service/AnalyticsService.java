@@ -121,9 +121,9 @@ public class AnalyticsService {
                 Double.parseDouble(lastCandlestick.getVolume()) > averageVolumeOfRedCandles
                 &&
                 (Double.parseDouble(lastCandlestick.getOpen()) - Double.parseDouble(lastCandlestick.getClose()) > averageDropPriceOfRedCandles)
-                //&&
+                &&
                 //(averageDropPriceOfRedCandles > averageRaisePriceOfGreenCandles && averageVolumeOfRedCandles > averageVolumeOfGreenCandles)
-
+                averageDropPriceOfRedCandles > averageRaisePriceOfGreenCandles
         )
         {
             isIdealSituationForBuy.replace(symbol, true);
