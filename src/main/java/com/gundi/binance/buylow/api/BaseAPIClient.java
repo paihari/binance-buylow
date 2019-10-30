@@ -7,6 +7,7 @@ import com.binance.api.client.BinanceApiWebSocketClient;
 import com.binance.api.client.domain.account.AssetBalance;
 import com.binance.api.client.domain.account.Order;
 import com.binance.api.client.domain.account.Trade;
+import com.binance.api.client.domain.account.request.AllOrdersRequest;
 import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.event.AggTradeEvent;
@@ -90,6 +91,13 @@ public abstract class BaseAPIClient implements APIClient{
     @Override
     public List<Order> getOpenOrders(OrderRequest orderRequest) {
         return this.apiRestClient.getOpenOrders(orderRequest);
+    }
+
+    public List<Order> getExecutedOrders(String symbol) {
+
+        AllOrdersRequest allOrdersRequest = new AllOrdersRequest(symbol);
+
+        return this.apiRestClient.getAllOrders(allOrdersRequest);
     }
 
     public List<Candlestick> getPastFiveDaysCandlestickBars(String symbol, CandlestickInterval candlestickInterval) {

@@ -1,11 +1,14 @@
 package com.gundi.binance.buylow.controller;
 
+import com.binance.api.client.domain.account.Order;
 import com.binance.api.client.domain.account.Trade;
 import com.gundi.binance.buylow.api.APIClient;
 import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.model.TradeLog;
 import com.gundi.binance.buylow.service.AuditService;
 import com.gundi.binance.buylow.service.CalculationService;
+import com.gundi.binance.buylow.service.ProfitService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
 public class BuyLowController {
 
     @Value("${spring.profiles.active}")
@@ -33,14 +41,20 @@ public class BuyLowController {
 
     private APIClient apiClient;
 
+    @Value("${start.time}")
+    String startTime;
+
+
     @Autowired
     public BuyLowController(CalculationService calculationService,
                             AuditService auditService,
                             APIClient apiClient
+
     ) {
         this.calculationService = calculationService;
         this.auditService = auditService;
         this.apiClient = apiClient;
+
     }
 
 
@@ -74,9 +88,11 @@ public class BuyLowController {
             message = message.concat("Average Raise of Green Candles " + pair.getPair() + "   " + auditService.getAverageRaiseOfGreenCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
             message = message.concat("Average Volume of Green Candles " + pair.getPair() + "   " + auditService.getAverageVolumeOfGreenCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
             message = message.concat(System.lineSeparator());
+            // 1572054422281
+            // 1566359220912L
 
             List<Trade> allTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
-                return trade.getTime() > 1566359220912L;
+                return trade.getTime() > Long.valueOf(startTime);
             }).collect(Collectors.toList());
 
             for (Trade trade : allTrades) {
@@ -158,37 +174,77 @@ public class BuyLowController {
     @RequestMapping("/calculate")
     public String calculate() {
 
-        List<Trade> listOfTrade = apiClient.getMyTrades("BNBUSDT");
 
-        for(Trade trade : listOfTrade) {
-            System.out.println(trade);
-        }
+           //profitService.transferProfit("BTCUSDT");
+        log.info(apiClient.getServerTime().toString());
 
-//        for (CryptoPair cryptoPair : CryptoPair.values()) {
-//            List<Trade> allTrades = apiClient.getMyTrades(cryptoPair.getPair()).stream().filter(trade -> {
-//                return trade.getTime() > 1561465294471L;
+
+//        for (CryptoPair pair: CryptoPair.values()) {
+//            List<Order> orderList = apiClient.getExecutedOrders(pair.getPair()).stream().filter(order -> {
+//                return order.getTime() > 1566359220912L;
 //            }).collect(Collectors.toList());
 //
 //
-//            Double buyValue = allTrades.stream().filter(trade -> {
-//                return trade.isBuyer();
-//            }).collect(Collectors.summingDouble(trade -> {
-//                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
-//            }));
+//            for(Order order : orderList) {
+//                //log.info("Order Info " + order.getOrderId());
+//            }
 //
-//            Double sellValue = allTrades.stream().filter(trade -> {
-//                return !trade.isBuyer();
-//            }).collect(Collectors.summingDouble(trade -> {
-//                return Double.parseDouble(trade.getQty()) * Double.parseDouble(trade.getPrice());
-//            }));
+////            Map<String, Trade> mapOfTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
+////                return trade.getTime() > 1566359220912L;
+////            }).collect(Collectors.toMap(Trade::getOrderId, trade -> trade));
 //
-//            System.out.println("Symbol " + cryptoPair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue);
-//            System.out.println("Profit/Loss " + (sellValue - buyValue));
+//
+////            Map<String, Set<Trade>> mapOfTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
+////                return trade.getTime() > 1566359220912L;
+////            }).collect(Collectors.groupingBy(Trade::getOrderId, Collectors.mapping(Trade::getOrderId, Collectors.toSet())));
+//
+//            //mapOfTrades.forEach((k,v) -> log.info("Key " + k));
+//
+//            List<Trade> tradeList = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
+//                return trade.getTime() > 1566359220912L;
+//            }).collect(Collectors.toList());
+//
+//            tradeList.forEach(k -> log.info(k.getOrderId() + " Order Id " + k.getId()));
+//
+//            Map<Boolean, List<Trade>> mapOfBuyAndSellTrades = tradeList.stream().collect(Collectors.groupingBy(Trade::isBuyer));
+//
+//
+//            //mapOfBuyAndSellTrades.forEach((k,v) -> log.info(" Key " + k + " Value " + v));
+//
+//            Map<Boolean, Map<String, List<Trade>>> mapOfBuySellTradesPerOrderId = tradeList.stream().collect(Collectors.groupingBy(Trade::isBuyer, Collectors.groupingBy(Trade::getOrderId)));
+//
+//            mapOfBuySellTradesPerOrderId.forEach((k,v) -> {
+//                    if(k) {
+//                        log.info("Buy Trades");
+//                        v.forEach((key, value) -> {
+//                            log.info("Key " + key + " Value " + value);
+//                        });
+//                    }
+//            });
+//
+//            //Map<Boolean, Map<String, Long>> mapOf
+
+
+
+ //       }
+
+//        for(CryptoPair pair: CryptoPair.values()) {
+//            List<Trade> allTrades = apiClient.getMyTrades(pair.getPair()).stream().filter(trade -> {
+//                return trade.getTime() > 1566359220912L;
+//            }).collect(Collectors.toList());
+//
+//            for (Trade trade : allTrades) {
+//
+//                LocalDateTime lastTradeTime =
+//                        LocalDateTime.ofInstant(Instant.ofEpochMilli(trade.getTime()),
+//                                ZoneId.systemDefault());
+//                System.out.println("Local Time " + lastTradeTime + " Epoch Time " + trade.getTime() + " Symbol " + trade.getSymbol());
+//
+//            }
+//
 //
 //
 //        }
-
-
         return "";
 
     }
