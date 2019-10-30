@@ -41,35 +41,7 @@ public class BuyLowPrimeService {
         this.analyticsService = analyticsService;
     }
 
-//    public void testUpgrade() {
-//        String pair = "XRPUSDT";
-//
-//        NewOrderResponse newOrderResponse = apiClient.newOrder(
-//                NewOrder.limitSell(pair, TimeInForce.GTC, "500", "0.29"));
-//        logger.info("New Order Response " + newOrderResponse.getClientOrderId());
-//
-//
-//    }
-
 
     public void invoke() {
-
-        String pair = CryptoPair.getPairsAsString();
-        apiClient.onAggTradeEvent(pair.toLowerCase(),
-                new BinanceApiCallback<AggTradeEvent>() {
-            @Override
-            public void onResponse(final AggTradeEvent aggTradeEvent) {
-                logger.trace("Web Socket Active " + LocalDateTime.now());
-                apiClient.ping();
-                sellService.invoke(aggTradeEvent);
-                buyService.invoke(aggTradeEvent);
-            }
-            public void onFailure(final Throwable cause) {
-                logger.error("Web Socket Failed " + LocalDateTime.now());
-                cause.printStackTrace();
-                invoke();
-            }
-        });
-
     }
 }

@@ -30,6 +30,7 @@ public interface APIClient {
 
      List<Candlestick> getPastFiveDaysCandlestickBars(String symbol, CandlestickInterval candlestickInterval);
      Long getServerTime();
+     public List<Order> getExecutedOrders(String symbol);
 
     //getApiRestClient().getAccount()
 

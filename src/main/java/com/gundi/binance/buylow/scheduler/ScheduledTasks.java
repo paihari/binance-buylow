@@ -3,6 +3,7 @@ package com.gundi.binance.buylow.scheduler;
 import com.gundi.binance.buylow.config.CryptoPair;
 import com.gundi.binance.buylow.service.AnalyticsService;
 import com.gundi.binance.buylow.service.BuyService;
+import com.gundi.binance.buylow.service.ProfitService;
 import com.gundi.binance.buylow.service.SellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,12 @@ public class ScheduledTasks {
 
     SellService sellService;
 
+    ProfitService profitService;
     @Autowired
     public ScheduledTasks(AnalyticsService analyticsService,
                           BuyService buyService,
-                          SellService sellService) {
+                          SellService sellService,
+                          ProfitService service) {
         this.analyticsService = analyticsService;
         this.buyService = buyService;
         this.sellService = sellService;
@@ -43,15 +46,17 @@ public class ScheduledTasks {
             if(idealSituationForBuy && cryptoPair.isKeepBuying()) {
                 buyService.tradeIt(cryptoPair.getPair());
             }
+
             Boolean idealSituationForSell = analyticsService.getIsIdealSituationForSell(cryptoPair.getPair());
             logger.info("Ideal Situation for Sell " + idealSituationForSell + " For " + cryptoPair.getPair());
             if(idealSituationForSell && cryptoPair.isKeepSelling()) {
-                sellService.tradeIt(cryptoPair.getPair());
+                boolean tradeDone = sellService.tradeIt(cryptoPair.getPair());
+                if(tradeDone) {
+                    profitService.transferProfit(cryptoPair.getPair());
+                }
             }
 
         }
-
-
     }
 
 }
