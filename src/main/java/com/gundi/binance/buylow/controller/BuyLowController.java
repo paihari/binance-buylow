@@ -41,6 +41,8 @@ public class BuyLowController {
 
     private APIClient apiClient;
 
+    private ProfitService profitService;
+
     @Value("${start.time}")
     String startTime;
 
@@ -48,12 +50,14 @@ public class BuyLowController {
     @Autowired
     public BuyLowController(CalculationService calculationService,
                             AuditService auditService,
-                            APIClient apiClient
+                            APIClient apiClient,
+                            ProfitService profitService
 
     ) {
         this.calculationService = calculationService;
         this.auditService = auditService;
         this.apiClient = apiClient;
+        this.profitService = profitService;
 
     }
 
@@ -81,13 +85,15 @@ public class BuyLowController {
 
         for(CryptoPair pair: CryptoPair.values()) {
 
-            message = message.concat(System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Average Drop of Red Candles for " + pair.getPair() + "   " + auditService.getAverageDropOfRedCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Average Volume of Red Candles for " + pair.getPair() + "   " + auditService.getAverageVolumeOfRedCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
-            message = message.concat(System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Average Raise of Green Candles " + pair.getPair() + "   " + auditService.getAverageRaiseOfGreenCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Average Volume of Green Candles " + pair.getPair() + "   " + auditService.getAverageVolumeOfGreenCandlesPerSymbol(pair.getPair()) + System.lineSeparator());
-            message = message.concat(System.lineSeparator());
+            message = message.concat("<br>");
             // 1572054422281
             // 1566359220912L
 
@@ -100,7 +106,7 @@ public class BuyLowController {
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(trade.getTime()),
                                 ZoneId.systemDefault());
                 String type = trade.isBuyer() ? "BUY" : "SELL";
-
+                message = message.concat("<br>");
                 message = message.concat("Symbol " + pair.getPair() + " Type " + type  + " Price " + trade.getPrice() + " Time " + lastTradeTime  + " Qty " + trade.getQty() + System.lineSeparator());
 
             }
@@ -154,20 +160,23 @@ public class BuyLowController {
                 return !trade.isBuyer();
             }).count();
 
-
+            message = message.concat("<br>");
             message = message.concat("Symbol " + pair.getPair() + " Average Buy Price " + averageBuyPrice + " Average Sell Price " + averageSellPrice) + System.lineSeparator();
+            message = message.concat("<br>");
+
             message = message.concat("Symbol " + pair.getPair() + " Number Of Buy Trades " + noOfBuyTrades + " No Of Sell Trades  " + noOfSellTrades + System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Symbol " + pair.getPair() + " Buy Value " + buyValue + " Sell Value " + sellValue + System.lineSeparator());
+            message = message.concat("<br>");
             message = message.concat("Symbol " + pair.getPair() + " Buy Quantity " + buyQuantity + " Sell Quantity " + sellQuantity);
+            message = message.concat("<br>");
 
-
-            message = message.concat(System.lineSeparator());
             message = message.concat("Symbol " + pair.getPair() + " Profit/Loss " + + (sellValue - buyValue));
+            message = message.concat("<br>");
 
-            message = message.concat(System.lineSeparator());
 
         }
-        message = message.concat(System.lineSeparator());
+        message = message.concat("<br>");
         return message;
     }
 
@@ -175,7 +184,7 @@ public class BuyLowController {
     public String calculate() {
 
 
-           //profitService.transferProfit("BTCUSDT");
+        //profitService.transferProfit("ETHUSDT");
         log.info(apiClient.getServerTime().toString());
 
 
