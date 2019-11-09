@@ -3,6 +3,7 @@ package com.gundi.binance.buylow.service;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.gundi.binance.buylow.api.APIClient;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class AnalyticsService {
 
     Logger logger = LoggerFactory.getLogger(AnalyticsService.class);
@@ -39,9 +41,10 @@ public class AnalyticsService {
         List<Candlestick> candlesticks = apiClient.getPastFiveDaysCandlestickBars(symbol,
                 CandlestickInterval.FIFTEEN_MINUTES);
         Collections.reverse(candlesticks);
+        log.info(" The Size of Candle Sticks " + candlesticks.size());
         // Remove the first unfilled Current Candle
-        candlesticks.remove(0);
 
+        candlesticks.remove(0);
         invoke(symbol, candlesticks);
     }
 
@@ -54,7 +57,26 @@ public class AnalyticsService {
             return Double.parseDouble(candlestick.getClose()) > Double.parseDouble(candlestick.getOpen());
         }).sorted(new SellComparator<Candlestick>()).limit(20).collect(Collectors.toList());
 
-        Double averageVolumeOfGreenCandles =  filteredGreenCandleList.stream().
+
+        List<Candlestick> filteredGreenCandleListPerVolume = candlesticks.stream().filter(candlestick -> {
+            return Double.parseDouble(candlestick.getClose()) > Double.parseDouble(candlestick.getOpen());
+        }).sorted(new Comparator<Candlestick>() {
+            @Override
+            public int compare(Candlestick c1, Candlestick c2) {
+
+                return Double.valueOf(c2.getVolume()).compareTo(Double.valueOf(c1.getVolume()));
+            }
+        } ).limit(20).collect(Collectors.toList());
+
+
+
+        filteredGreenCandleList.forEach( c -> log.trace("Green Candles " + c));
+        log.trace("Green Candle List " + filteredGreenCandleList.size());
+
+        filteredGreenCandleListPerVolume.forEach(c -> log.trace("Green Candles per Volume " + c));
+
+
+        Double averageVolumeOfGreenCandles =  filteredGreenCandleListPerVolume.stream().
                 mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
 
         Double averageRaisePriceOfGreenCandles = filteredGreenCandleList.stream().
@@ -66,9 +88,12 @@ public class AnalyticsService {
 
         auditService.setAverageRaiseOfGreenCandlesPerSymbol(symbol, averageRaisePriceOfGreenCandles);
         auditService.setAverageVolumeOfGreenCandlesPerSymbol(symbol, averageVolumeOfGreenCandles);
+
         logger.trace("AverageRaiseOfGreenCandles " + averageRaisePriceOfGreenCandles + " Symbol " + symbol);
         logger.trace("AverageVolumeOfGreenCandles " + averageVolumeOfGreenCandles + " Symbol " + symbol) ;
+
         isIdealSituationForSell.put(symbol, false);
+        isIdealSituationForBuy.put(symbol, false);
 
 
         // Get filtered 20 Candle sticks with Top Drops
@@ -76,7 +101,19 @@ public class AnalyticsService {
             return Double.parseDouble(candlestick.getClose()) < Double.parseDouble(candlestick.getOpen());
         }).sorted(new BuyComparator<Candlestick>()).limit(20).collect(Collectors.toList());
 
-        Double averageVolumeOfRedCandles =  filteredRedCandleList.stream().
+        List<Candlestick> filteredRedCandleListPerVolume = candlesticks.stream().filter(candlestick -> {
+            return Double.parseDouble(candlestick.getClose()) < Double.parseDouble(candlestick.getOpen());
+        }).sorted(new Comparator<Candlestick>() {
+            @Override
+            public int compare(Candlestick c1, Candlestick c2) {
+                return Double.valueOf(c2.getVolume()).compareTo(Double.valueOf(c1.getVolume()));
+            }
+        }).limit(20).collect(Collectors.toList());
+
+
+        filteredRedCandleList.forEach(c -> log.trace("Red Candles " + c));
+
+        Double averageVolumeOfRedCandles =  filteredRedCandleListPerVolume.stream().
                 mapToDouble(s -> new Double(s.getVolume())).average().getAsDouble();
 
         Double averageDropPriceOfRedCandles = filteredRedCandleList.stream().
@@ -92,8 +129,8 @@ public class AnalyticsService {
         logger.trace("AverageVolumeOfRedCandles " + averageVolumeOfRedCandles + " Symbol " + symbol) ;
 
 
+        log.trace("Last Candle Stick" + lastCandlestick);
 
-        isIdealSituationForBuy.put(symbol, false);
 
         // Ideal situation to Sell when lastCandle Stick is Green and
         // Volume of the Last Candle Stick exceeds the average
