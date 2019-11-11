@@ -9,13 +9,11 @@ public enum CryptoPair implements Serializable{
 
 
     //XRPUSDT("XRPUSDT", "100", "USDT", "XRP", false),
-    BTCUSDT("BTCUSDT", "0.08", "USDT", "BTC", true, true);
+    BTCUSDT("BTCUSDT", "0.08", "USDT", "BTC", true, true),
+    LINKUSDT("LINKUSDT", "250", "USDT", "LINK", true, true);
     //BNBUSDT("BNBUSDT", "1.2", "USDT", "BNB", true, true),
     //ETHUSDT("ETHUSDT", "4", "USDT", "ETH", false, false),
     //BCHABCUSDT("BCHABCUSDT", "2.5", "USDT", "BCHABC", true, true);
-
-
-
 
 
     private String pair;
