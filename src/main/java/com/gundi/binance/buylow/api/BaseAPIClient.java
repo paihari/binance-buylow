@@ -105,7 +105,7 @@ public abstract class BaseAPIClient implements APIClient{
 
         //Long timeThreeDaysBack = serverTime - 120 * 60 * 1000;
 
-        Long timeFiveDaysBack = serverTime - 5 * 24 * 60 * 60 * 1000;
+        Long timeFiveDaysBack = serverTime - 3 * 24 * 60 * 60 * 1000;
 
         return this.apiRestClient.getCandlestickBars(symbol, candlestickInterval,
                 500, timeFiveDaysBack,
