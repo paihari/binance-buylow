@@ -46,7 +46,6 @@ public class APIKeyAndSecretConfig {
         // In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
         // See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         // We rethrow the exception by default.
-
         String secret = "";
         String decodedBinarySecret = "";
         GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest()
